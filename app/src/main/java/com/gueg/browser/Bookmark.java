@@ -11,10 +11,6 @@ class Bookmark implements java.io.Serializable{
         mPic = pic;
     }
 
-    Bookmark(String name, String url) {
-        mName = name;
-        mUrl = url;
-    }
 
     private String mName;
     private String mUrl;

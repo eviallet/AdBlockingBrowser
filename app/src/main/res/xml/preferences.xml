@@ -7,6 +7,9 @@
             android:title="@string/pref_homepage"
             android:key="prefHomepage"
             android:defaultValue="@string/pref_def_homepage" />
+        <Preference
+            android:title="@string/prefs_share"
+            android:key="prefShare" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_cat_color" >
         <yuku.ambilwarna.widget.AmbilWarnaPreference

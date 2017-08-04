@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Base64;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -52,19 +51,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.d(MainActivity.class.getSimpleName(),"----- Entering onCreate()");
 
         // Inflating layout
 
         super.onCreate(savedInstanceState);
-        Log.d(MainActivity.class.getSimpleName(),"------ Setting content view");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
 
         // Fragments
 
-        Log.d(MainActivity.class.getSimpleName(),"------ Creating fragment_container and tab_manager");
 
         tab_manager = new TabCardsFragment();
 
@@ -84,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         // ListView ---------------------------------
 
-        Log.d(MainActivity.class.getSimpleName(),"------ Creating drawer");
 
 
         bookmarksDrawer = (RecyclerView) findViewById(R.id.recycler_view_bookmarks);
@@ -151,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Buttons --------------------------------------
 
-        Log.d(MainActivity.class.getSimpleName(),"------ Creating buttons");
 
         ImageButton btn_fav = (ImageButton) findViewById(R.id.btn_drawer_favoris);
         ImageButton btn_next = (ImageButton) findViewById(R.id.btn_drawer_suivant);
@@ -176,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 bundle.putSerializable("BOOKMARKS_LIST", bookmarksListString);
                 intent.putExtras(bundle);
-                Log.d("MainActivity","Size of the sent bookmarksList : "+Integer.toString(bookmarksList.size()));
                 startActivityForResult(intent,ACTIVITY_RESULTS_BTN_FAV_SORT);
                 return true;
             }
@@ -229,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
                 assert dl != null;
                 dl.closeDrawer(GravityCompat.START);
-                Log.d(MainActivity.class.getSimpleName(),"------ Btn onglets clicked");
                 setCurrentFragment(-1);
             }
         });
@@ -242,12 +234,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Log.d(MainActivity.class.getSimpleName(),"------ Buttons created");
 
         // =================================== FRAGMENTS
 
 
-        Log.d(MainActivity.class.getSimpleName(),"------ Leaving onCreate()");
 
         sharedPrefUrls = getSharedPreferences(getString(R.string.urls_list_key),Context.MODE_PRIVATE);
 
@@ -335,13 +325,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void addTab() {
-        Log.d(MainActivity.class.getSimpleName(),"----- Adding tab");
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
         CustomWebViewFragment fragment = new CustomWebViewFragment();
         fragments.add(fragment);
-        Log.d(MainActivity.class.getSimpleName(),"------ tab tag : frag"+Integer.toString(fragments.size()));
         transaction.add(R.id.fragment_container,fragment,"frag"+Integer.toString(fragments.size()));
         transaction.commit();
         manager.executePendingTransactions();
@@ -350,14 +338,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addTab(String url) {
-        Log.d(MainActivity.class.getSimpleName(),"----- Adding tab");
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
         CustomWebViewFragment fragment = new CustomWebViewFragment();
         fragments.add(fragment);
         fragment.setOnStartUrl(url);
-        Log.d(MainActivity.class.getSimpleName(),"------ tab tag : frag"+Integer.toString(fragments.size()));
         transaction.add(R.id.fragment_container,fragment,"frag"+Integer.toString(fragments.size()));
         transaction.commit();
         manager.executePendingTransactions();
@@ -367,13 +353,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addTab(String url, Fragment frag) {
-        Log.d(MainActivity.class.getSimpleName(),"----- Adding tab");
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
         CustomWebViewFragment fragment = new CustomWebViewFragment();
         fragments.add(fragment);
-        Log.d(MainActivity.class.getSimpleName(),"------ tab tag : frag"+Integer.toString(fragments.size()));
         transaction.add(R.id.fragment_container,fragment,"frag"+Integer.toString(fragments.size()));
         transaction.commit();
         manager.executePendingTransactions();
@@ -390,7 +374,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addTab(String url, int posCurTab) {
-        Log.d(MainActivity.class.getSimpleName(),"----- Adding tab");
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
@@ -398,7 +381,6 @@ public class MainActivity extends AppCompatActivity {
         fragment.setOnStartUrl(url);
         fragments.add(fragment);
 
-        Log.d(MainActivity.class.getSimpleName(),"------ tab tag : frag"+Integer.toString(fragments.size()));
         transaction.add(R.id.fragment_container,fragment,"frag"+Integer.toString(fragments.size()));
 
         transaction.commit();
@@ -458,7 +440,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setCurrentFragment(int pos) {
-        Log.d(MainActivity.class.getSimpleName(),"----- Current tab : "+Integer.toString(pos+1)+"/"+Integer.toString(fragments.size()));
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
@@ -642,7 +623,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPrefFavs.edit();
         String key,value;
         editor.putInt(getString(R.string.bookmarks_list_size),bookmarksList.size());
-        Log.d("WRITING",Integer.toString(bookmarksList.size()));
         for(int i=0; i<bookmarksList.size();i++) {
             key = getString(R.string.bookmarks_list_item)+Integer.toString(i);
             value = bookmarksList.get(i).getName()+'|'+bookmarksList.get(i).getUrl()+'|';

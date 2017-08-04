@@ -52,11 +52,6 @@ class BookmarksCardsAdapter extends RecyclerView.Adapter<BookmarksCardsAdapter.V
         return mList.size();
     }
 
-    void refresh(ArrayList<Bookmark> list) {
-        mList.clear();
-        mList.addAll(list);
-        notifyDataSetChanged();
-    }
 
 
 }

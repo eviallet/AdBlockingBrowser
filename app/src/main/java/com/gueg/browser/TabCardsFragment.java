@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,24 +22,18 @@ public class TabCardsFragment extends Fragment {
     View rootView;
     ArrayList<WebPage> list;
 
-    String TAG = "TabCardsFragments";
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"onCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG,"onCreateView");
         rootView = inflater.inflate(R.layout.fragment_tabcards,container,false);
-        Log.d(TAG,"rootView inflated");
         list = ((MainActivity)getActivity()).getTabList();
-        Log.d(TAG,"list getted from mainactivity");
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        Log.d(TAG,"mRecyclerView inflated");
         ImageButton tab_add = (ImageButton) rootView.findViewById(R.id.btn_tab_add);
         assert mRecyclerView != null;
         mRecyclerView.setHasFixedSize(true);
@@ -95,20 +88,17 @@ public class TabCardsFragment extends Fragment {
 
         );
 
-        Log.d(TAG,"setting layoutmanager");
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        Log.d(TAG,"Calling TabCardsAdapter");
 
         mAdapter = new TabCardsAdapter(list);
 
 
-        Log.d(TAG,"adapter and interface created");
+
         mRecyclerView.setAdapter(mAdapter);
-        Log.d(TAG,"adapter setted");
 
         tab_add.setOnClickListener(new View.OnClickListener() {
             @Override
