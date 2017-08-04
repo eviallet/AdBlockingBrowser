@@ -26,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         bookmarksDrawer.setAdapter(mAdapter);
 
 
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -123,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition(); //get position which is swiped
 
-                if (direction == ItemTouchHelper.LEFT) { // delete
-                    bookmarksDrawer.removeViewAt(position);
+                if (direction == ItemTouchHelper.RIGHT) { // delete
                     bookmarksList.remove(position);
+                    bookmarksDrawer.removeViewAt(position);
                     mAdapter.notifyItemRemoved(position);
                     mAdapter.notifyItemRangeChanged(position, bookmarksList.size());
-                    mAdapter.refresh(bookmarksList);
+                    writeBookmarks();
                 }
             }
 
