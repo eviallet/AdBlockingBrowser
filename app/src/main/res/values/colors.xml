@@ -6,7 +6,8 @@
     <color name="colorDrawer">#D8D8D8</color>
     <color name="colorDivider">#C9C0BE</color>
     <color name="colorLVBackground">#FFFFFF</color>
-    <color name="colorText">#545252</color>
+    <color name="colorTextBlack">#545252</color>
+    <color name="colorTextWhite">#FFFFFF</color>
     <color name="colorTextWebView">#FFFFFF</color>
 
 </resources>

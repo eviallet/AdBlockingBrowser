@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/relatLayoutWeb"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
@@ -34,7 +35,6 @@
         android:textSize="21sp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/colorText"
         android:inputType="textNoSuggestions"
         android:hint=""
         android:layout_centerVertical="true" />

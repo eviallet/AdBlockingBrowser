@@ -3,8 +3,10 @@ package com.gueg.browser;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
@@ -64,6 +67,9 @@ public class CustomWebViewFragment extends WebViewFragment {
     int posFrag;
     private String toLoad;
     String homepage;
+    int colorMain;
+    int colorBar;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,12 +85,31 @@ public class CustomWebViewFragment extends WebViewFragment {
         super.onCreateView(inflater,container,savedInstanceState);
         web = (WebView) rootView.findViewById(R.id.webView);
         Log.d(CustomWebViewFragment.class.getSimpleName(),"----- WebView created");
+        RelativeLayout rel = (RelativeLayout) rootView.findViewById(R.id.relatLayoutWeb);
         text = (EditText) rootView.findViewById(R.id.webViewText);
         image = (ImageView) rootView.findViewById(R.id.imageViewWeb);
         btn_onglet = (ImageButton) rootView.findViewById(R.id.cwvTabs);
 
+
+
         SharedPreferences mainPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         homepage = mainPref.getString("prefHomepage","http://www.google.fr");
+        colorMain = mainPref.getInt("prefColorMain",R.color.colorPrimary);
+        colorBar =  mainPref.getInt("prefColorBar",R.color.colorTextWebView);
+
+        rel.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        text.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        image.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        btn_onglet.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+
+        boolean isChecked = mainPref.getBoolean("prefColorBarText",true);
+
+        if(isChecked)
+            text.setTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorTextBlack)));
+        else
+            text.setTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorTextWhite)));
+
+
 
         assert btn_onglet != null;
         btn_onglet.setOnClickListener(new View.OnClickListener() {
@@ -169,6 +194,7 @@ public class CustomWebViewFragment extends WebViewFragment {
             @Override
             public void onProgressChanged(WebView view, int progress) {
                 progressBar.setMax(100);
+                progressBar.setProgressTintList(ColorStateList.valueOf(colorMain));
                 progressBar.setProgress(progress);
                 if (progress == 100) {
                     progressBar.setVisibility(View.GONE);

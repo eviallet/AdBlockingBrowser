@@ -13,8 +13,18 @@
 
     // Settings
     <string name="pref_homepage">Page d\'accueil</string>
+    <string name="pref_colorMain">Couleur générale</string>
+    <string name="pref_colorBar">Couleur de la barre d\'adresse</string>
+    <string name="pref_colorBarText">Couleur du texte de la barre d\'adresse</string>
+
+
+
     <string name="pref_cat_general">Options générales</string>
+    <string name="pref_cat_color">Couleurs</string>
+
+
     <string name="pref_def_homepage">http://www.google.fr</string>
+
 
 
     // SharedPref
