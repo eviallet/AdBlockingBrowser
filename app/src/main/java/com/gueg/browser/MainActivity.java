@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     // TODO -- custom animations tabs
 
 
-    int ACTIVITY_RESULTS_BTN_FAV = 1;
+    int ACTIVITY_RESULTS_BTN_FAV_NEW = 1;
+    int ACTIVITY_RESULTS_BTN_FAV_SORT = 2;
     TabCardsFragment tab_manager;
     FrameLayout fragment_container;
     ArrayList<CustomWebViewFragment> fragments = new ArrayList<>();
@@ -109,13 +110,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                /*final int fromPos = viewHolder.getAdapterPosition();
-                final int toPos = target.getAdapterPosition();
-
-                Collections.swap(bookmarksList,fromPos,toPos);
-                mAdapter.notifyItemMoved(fromPos,toPos);
-                mAdapter.refresh(bookmarksList);
-                return true;*/
                 return false;
             }
 
@@ -161,13 +155,30 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton btn_fav = (ImageButton) findViewById(R.id.btn_drawer_favoris);
         ImageButton btn_next = (ImageButton) findViewById(R.id.btn_drawer_suivant);
-        ImageButton btn_onglets = (ImageButton) findViewById(R.id.btn_drawer_onglets);
-        ImageButton btn_parametres = (ImageButton) findViewById(R.id.btn_drawer_parametres);
+        ImageButton btn_tabs = (ImageButton) findViewById(R.id.btn_drawer_onglets);
+        ImageButton btn_settings = (ImageButton) findViewById(R.id.btn_drawer_parametres);
         assert btn_fav != null;
         btn_fav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 newBookmark();
+            }
+        });
+        btn_fav.setLongClickable(true);
+        btn_fav.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Intent intent = new Intent(MainActivity.this,BookmarkSortActivity.class);
+                Bundle bundle = new Bundle();
+                ArrayList<String> bookmarksListString = new ArrayList<>(bookmarksList.size());
+                for(int i=0; i<bookmarksList.size(); i++) {
+                    bookmarksListString.add(bookmarksList.get(i).getName());
+                }
+                bundle.putSerializable("BOOKMARKS_LIST", bookmarksListString);
+                intent.putExtras(bundle);
+                Log.d("MainActivity","Size of the sent bookmarksList : "+Integer.toString(bookmarksList.size()));
+                startActivityForResult(intent,ACTIVITY_RESULTS_BTN_FAV_SORT);
+                return true;
             }
         });
 
@@ -191,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        assert btn_parametres != null;
-        btn_parametres.setOnClickListener(new View.OnClickListener() {
+        assert btn_settings != null;
+        btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -211,8 +222,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        assert btn_onglets != null;
-        btn_onglets.setOnClickListener(new View.OnClickListener() {
+        assert btn_tabs != null;
+        btn_tabs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -222,8 +233,8 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(-1);
             }
         });
-        btn_onglets.setLongClickable(true);
-        btn_onglets.setOnLongClickListener(new View.OnLongClickListener() {
+        btn_tabs.setLongClickable(true);
+        btn_tabs.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 endMainActivity();
@@ -591,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("com.gueg.browser.URL", url);
             if(pic!=null) {
                 intent.putExtra("com.gueg.browser.PIC", pic);
-                startActivityForResult(intent, ACTIVITY_RESULTS_BTN_FAV);
+                startActivityForResult(intent, ACTIVITY_RESULTS_BTN_FAV_NEW);
             }
             else
                 Toast.makeText(this,"Chargement de l'image du site...", Toast.LENGTH_SHORT).show();
@@ -631,6 +642,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPrefFavs.edit();
         String key,value;
         editor.putInt(getString(R.string.bookmarks_list_size),bookmarksList.size());
+        Log.d("WRITING",Integer.toString(bookmarksList.size()));
         for(int i=0; i<bookmarksList.size();i++) {
             key = getString(R.string.bookmarks_list_item)+Integer.toString(i);
             value = bookmarksList.get(i).getName()+'|'+bookmarksList.get(i).getUrl()+'|';
@@ -643,7 +655,6 @@ public class MainActivity extends AppCompatActivity {
 
             editor.putString(key+"_PIC",encoded);
         }
-
 
         editor.apply();
     }
@@ -692,7 +703,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == ACTIVITY_RESULTS_BTN_FAV) {
+        if (requestCode == ACTIVITY_RESULTS_BTN_FAV_NEW) {
             if(resultCode == Activity.RESULT_OK){
                 Bundle results = data.getExtras();
                 final String title = results.getString("com.gueg.browser.NEWTITLE");
@@ -701,6 +712,28 @@ public class MainActivity extends AppCompatActivity {
 
                 new DbBitmapUtility();
                 bookmarksList.add(new Bookmark(title,url,DbBitmapUtility.getImage(pic)));
+                writeBookmarks();
+            }
+            /*if (resultCode == Activity.RESULT_CANCELED) {
+
+            }*/
+        }
+        else if (requestCode == ACTIVITY_RESULTS_BTN_FAV_SORT) {
+            if(resultCode == Activity.RESULT_OK){
+                Bundle results = data.getExtras();
+                ArrayList<String> bookmarkListString = (ArrayList<String>) results.getSerializable("BOOKMARKS_LIST");
+
+                for(int i=0; i<bookmarkListString.size(); i++) {
+                    for(int j=0; j<bookmarksList.size(); j++) {
+                        if(bookmarkListString.get(i).equals(bookmarksList.get(j).getName())) {
+                            Bookmark temp = bookmarksList.get(j);
+                            bookmarksList.remove(j);
+                            bookmarksList.add(i, temp);
+                        }
+                    }
+                }
+
+                mAdapter.notifyDataSetChanged();
                 writeBookmarks();
             }
             /*if (resultCode == Activity.RESULT_CANCELED) {

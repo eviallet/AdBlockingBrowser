@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".BookmarkActivity" />
+        <activity android:name=".BookmarkSortActivity" />
         <activity android:name=".SettingsActivity" />
         <service android:name=".FirebasePushNotification"
             android:enabled="true"

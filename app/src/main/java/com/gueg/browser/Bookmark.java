@@ -3,7 +3,7 @@ package com.gueg.browser;
 
 import android.graphics.Bitmap;
 
-class Bookmark {
+class Bookmark implements java.io.Serializable{
 
     Bookmark(String name, String url, Bitmap pic) {
         mName = name;

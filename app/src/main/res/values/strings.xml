@@ -16,6 +16,7 @@
     <string name="pref_colorMain">Couleur générale</string>
     <string name="pref_colorBar">Couleur de la barre d\'adresse</string>
     <string name="pref_colorBarText">Couleur du texte de la barre d\'adresse</string>
+    <string name="prefs_bookmarks_sort">Trier les favoris</string>
 
 
 
