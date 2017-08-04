@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ea4e00</color>
+    <color name="colorPrimaryDark">#ea4e00</color>
+    <color name="colorAccent">#8686d3</color>
+    <color name="colorDrawer">#D8D8D8</color>
+    <color name="colorDivider">#C9C0BE</color>
+    <color name="colorLVBackground">#FFFFFF</color>
+    <color name="colorText">#545252</color>
+    <color name="colorTextWebView">#FFFFFF</color>
+
+</resources>

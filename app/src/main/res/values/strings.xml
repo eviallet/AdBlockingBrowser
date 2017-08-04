@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Browser</string>
+    <string name="homepage">http://www.google.fr</string>
+
+
+
+    // BookmarkActivity
+    <string name ="bookmarkActivity_valider">Valider</string>
+    <string name ="bookmarkActivity_annuler">Annuler</string>
+    <string name ="bookmarkActivity_titre">Titre</string>
+    <string name ="bookmarkActivity_url">URL</string>
+    <string name ="bookmarkActivity_pic">Image</string>
+
+    // Settings
+    <string name="pref_homepage">Page d\'accueil</string>
+    <string name="pref_cat_general">Options générales</string>
+    <string name="pref_def_homepage">http://www.google.fr</string>
+
+
+    // SharedPref
+    <string name="bookmarks_list_key">com.gueg.browser.BOOKMARKS_LIST</string>
+    <string name="bookmarks_list_size">com.gueg.browser.BOOKMARKS_LIST_SIZE</string>
+    <string name="bookmarks_list_item">com.gueg.browser.BOOKMARKS_LIST_ITEM_</string>
+
+    <string name="urls_list_key">com.gueg.browser.URLS_LIST</string>
+    <string name="urls_list_size">com.gueg.browser.URLS_LIST_SIZE</string>
+    <string name="urls_list_item">com.gueg.browser.URLS_LIST_ITEM_</string>
+
+
+
+
+
+</resources>

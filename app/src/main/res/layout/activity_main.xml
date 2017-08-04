@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?android:attr/selectableItemBackground"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gueg.browser.MainActivity">
+    <!-- The main content view -->
+    <LinearLayout
+        android:id="@+id/content_frame"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+    </LinearLayout>
+    <!-- The navigation drawer -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer"
+        android:orientation="vertical"
+        android:layout_width="200dp"
+        android:layout_height="fill_parent"
+        android:layout_gravity="start"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp">
+        <LinearLayout
+            android:id="@+id/drawer_buttons_1"
+            android:layout_width="match_parent"
+            android:layout_height="51dp"
+            android:background="@color/colorDrawer">
+            <ImageButton
+                android:id="@+id/btn_drawer_favoris"
+                android:src="@mipmap/ic_fav_yes"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                tools:ignore="ContentDescription" />
+             <ImageButton
+                android:id="@+id/btn_drawer_onglets"
+                android:src="@mipmap/ic_tabs"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                tools:ignore="ContentDescription" />
+            <ImageButton
+                android:id="@+id/btn_drawer_parametres"
+                android:src="@mipmap/ic_settings"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                tools:ignore="ContentDescription" />
+            <ImageButton
+                android:id="@+id/btn_drawer_suivant"
+                android:src="@mipmap/ic_next"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:background="@color/colorDrawer"
+            android:choiceMode="singleChoice"
+            android:id="@+id/recycler_view_bookmarks"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:padding="5dp"
+            android:clipToPadding="false" />
+    </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>
+

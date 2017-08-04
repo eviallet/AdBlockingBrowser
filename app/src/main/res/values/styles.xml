@@ -1,0 +1,17 @@
+<resources>
+
+    <style name="ListViewStyle.Light" parent="android:style/Widget.ListView">
+        <item name="android:background">@color/colorLVBackground</item>
+        <item name="android:divider">@color/colorDivider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:drawSelectorOnTop">false</item>
+        <item name="android:cacheColorHint">#00000000</item>
+    </style>
+
+    <style name="BrowserTheme" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:colorAccent">@color/accent_material_light</item>
+    </style>
+
+    <style name="D" parent="android:Theme.Material.NoActionBar.Fullscreen" />
+
+</resources>
