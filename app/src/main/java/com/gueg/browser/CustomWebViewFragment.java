@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import android.view.inputmethod.EditorInfo;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -41,6 +41,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class CustomWebViewFragment extends WebViewFragment {
@@ -67,12 +68,12 @@ public class CustomWebViewFragment extends WebViewFragment {
     String homepage;
     int colorMain;
     int colorBar;
+    boolean blockAds;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(CustomWebViewFragment.class.getSimpleName(),"----- WebViewFragment created");
     }
 
 
@@ -82,13 +83,12 @@ public class CustomWebViewFragment extends WebViewFragment {
         rootView = inflater.inflate(R.layout.fragment_webview, container, false);
         super.onCreateView(inflater,container,savedInstanceState);
         web = (WebView) rootView.findViewById(R.id.webView);
-        Log.d(CustomWebViewFragment.class.getSimpleName(),"----- WebView created");
         RelativeLayout rel = (RelativeLayout) rootView.findViewById(R.id.relatLayoutWeb);
         text = (EditText) rootView.findViewById(R.id.webViewText);
         image = (ImageView) rootView.findViewById(R.id.imageViewWeb);
         btn_onglet = (ImageButton) rootView.findViewById(R.id.cwvTabs);
 
-
+        AdBlocker.init(getActivity());
 
         SharedPreferences mainPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         homepage = mainPref.getString("prefHomepage","http://www.google.fr");
@@ -99,6 +99,8 @@ public class CustomWebViewFragment extends WebViewFragment {
         text.setBackgroundTintList(ColorStateList.valueOf(colorBar));
         image.setBackgroundTintList(ColorStateList.valueOf(colorBar));
         btn_onglet.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+
+        blockAds = mainPref.getBoolean("prefAdBlock",true);
 
         boolean isChecked = mainPref.getBoolean("prefColorBarText",true);
 
@@ -113,7 +115,6 @@ public class CustomWebViewFragment extends WebViewFragment {
         btn_onglet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(CustomWebViewFragment.class.getSimpleName(),"------ Btn onglets clicked");
                 ((MainActivity)getActivity()).setCurrentFragment(-1);
             }
         });
@@ -233,14 +234,16 @@ public class CustomWebViewFragment extends WebViewFragment {
 
         web.setWebViewClient(new WebViewClient() {
 
-              @Override
-               public boolean shouldOverrideUrlLoading(WebView view, String url)
-              {
-                  HashMap<String, String> extraHeaders = new HashMap<>();
-                  extraHeaders.put("DNT", "1");
-                  view.loadUrl(url, extraHeaders);
-                  return true;
-              }
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+
+                if(blockAds)
+                    return AdBlocker.isAd(url) ? AdBlocker.createEmptyResource() :
+                        super.shouldInterceptRequest(view, url);
+                else
+                    return super.shouldInterceptRequest(view,url);
+
+            }
 
               @Override
               public void onPageStarted(WebView view, String url, Bitmap favIcon) {
@@ -249,7 +252,6 @@ public class CustomWebViewFragment extends WebViewFragment {
 
               @Override
               public void onPageFinished(WebView view, String url) {
-                  Log.d(CustomWebViewFragment.class.getSimpleName(), "----- Page loaded : " + web.getTitle());
                   if (mListener != null)
                       mListener.onPageLoaded(new WebPage(web.getTitle(), web.getUrl(), web.getFavicon()));
 
@@ -342,6 +344,7 @@ public class CustomWebViewFragment extends WebViewFragment {
 
     @Override
     public void onPause() {
+        web.onPause();
         super.onPause();
     }
 
@@ -349,13 +352,12 @@ public class CustomWebViewFragment extends WebViewFragment {
     public void onResume() {
         web.onResume();
         super.onResume();
-        web.requestFocus();
     }
 
     @Override
-    public void onStart() {
+    public void onActivityCreated(Bundle savedInstanceState) {
         web.loadUrl(toLoad);
-        super.onStart();
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override

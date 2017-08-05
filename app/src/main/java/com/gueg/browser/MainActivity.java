@@ -335,6 +335,8 @@ public class MainActivity extends AppCompatActivity {
         manager.executePendingTransactions();
 
         setCurrentFragment(fragment);
+
+        writeCurrentUrls();
     }
 
     public void addTab(String url) {
@@ -350,6 +352,8 @@ public class MainActivity extends AppCompatActivity {
         setCurrentFragment(fragment);
 
         fragment.setPos(fragments.size());
+
+        writeCurrentUrls();
     }
 
     public void addTab(String url, Fragment frag) {
@@ -371,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
         else
             setCurrentFragment((CustomWebViewFragment) frag);
 
+        writeCurrentUrls();
     }
 
     public void addTab(String url, int posCurTab) {
@@ -392,6 +397,7 @@ public class MainActivity extends AppCompatActivity {
         fragment.setPos(fragments.size());
 
         setCurrentFragment(posCurTab);
+        writeCurrentUrls();
 
     }
 
@@ -412,6 +418,7 @@ public class MainActivity extends AppCompatActivity {
             addTab();
         transaction.commit();
         manager.executePendingTransactions();
+        writeCurrentUrls();
     }
     public void closeTab(CustomWebViewFragment frag) {
         android.app.FragmentManager manager = getFragmentManager();
@@ -424,6 +431,7 @@ public class MainActivity extends AppCompatActivity {
             addTab();
         transaction.commit();
         manager.executePendingTransactions();
+        writeCurrentUrls();
     }
 
     public void closeAllTabs() {
@@ -437,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
         addTab();
         transaction.commit();
         manager.executePendingTransactions();
+        writeCurrentUrls();
     }
 
     public void setCurrentFragment(int pos) {

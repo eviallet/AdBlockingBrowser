@@ -19,7 +19,7 @@ public class SettingsActivity extends PreferenceActivity {
                 Intent i=new Intent(android.content.Intent.ACTION_SEND);
                 i.setType("text/plain");
                 i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Partager");
-                i.putExtra(android.content.Intent.EXTRA_TEXT, "https://drive.google.com/file/d/0B0IkweJhZVSfSWM0Z0lVWlNQSms/view?usp=sharing");
+                i.putExtra(android.content.Intent.EXTRA_TEXT, getResources().getString(R.string.share_link));
                 startActivity(Intent.createChooser(i,"Partager avec"));
                 return true;
             }

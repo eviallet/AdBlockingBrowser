@@ -7,6 +7,10 @@
             android:title="@string/pref_homepage"
             android:key="prefHomepage"
             android:defaultValue="@string/pref_def_homepage" />
+        <CheckBoxPreference
+            android:title="@string/pref_adblock"
+            android:key="prefAdBlock"
+            android:defaultValue="true" />
         <Preference
             android:title="@string/prefs_share"
             android:key="prefShare" />
