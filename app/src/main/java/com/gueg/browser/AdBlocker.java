@@ -61,7 +61,7 @@ public class AdBlocker {
             domain+=c;
             if(domain.contains("http://")||domain.contains("https://")||domain.contains("www.")||domain.matches("ww[0-9]."))
                 domain="";
-            if(domain.contains(".fr")||domain.contains(".com")||domain.contains(".net"))
+            if(domain.contains(".fr")||domain.contains(".com")||domain.contains(".net")||domain.contains(".co.uk")||domain.contains(".de"))
                 domainFound=true;
 
             i++;

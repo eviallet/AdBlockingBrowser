@@ -8,12 +8,15 @@
             android:key="prefHomepage"
             android:defaultValue="@string/pref_def_homepage" />
         <CheckBoxPreference
-            android:title="@string/pref_adblock"
+            android:title="@string/prefs_adblock"
             android:key="prefAdBlock"
             android:defaultValue="true" />
         <Preference
             android:title="@string/prefs_share"
             android:key="prefShare" />
+        <Preference
+            android:title="@string/prefs_update"
+            android:key="prefUpdate" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_cat_color" >
         <yuku.ambilwarna.widget.AmbilWarnaPreference

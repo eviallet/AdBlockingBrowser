@@ -5,10 +5,15 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 
 public class TabCardsFragment extends Fragment {
@@ -35,22 +40,76 @@ public class TabCardsFragment extends Fragment {
         list = ((MainActivity)getActivity()).getTabList();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         ImageButton tab_add = (ImageButton) rootView.findViewById(R.id.btn_tab_add);
+        final EditText search = (EditText) rootView.findViewById(R.id.fragment_default_search);
+
+        search.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if(search.getText().toString().toLowerCase().contains("http://")||search.getText().toString().toLowerCase().contains("https://")) {
+                        ((MainActivity)getActivity()).addTab(search.getText().toString());
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains("www")) {
+                        String display = "http://"+search.getText().toString();
+                        search.setText(display);
+                        ((MainActivity)getActivity()).addTab(display);
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains(".fr")||search.getText().toString().toLowerCase().contains(".com")) {
+                        String display = "http://www."+search.getText().toString();
+                        search.setText(display);
+                        ((MainActivity)getActivity()).addTab(display);
+                        search.setText("");
+                    }
+                    else {
+                        ((MainActivity) getActivity()).addTab("https://www.google.fr/search?q=" + search.getText().toString());
+                        search.setText("");
+                    }
+
+                }
+                return false;
+            }
+        });
+
+        ImageButton im = (ImageButton) rootView.findViewById(R.id.fragment_default_button);
+        im.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!search.getText().toString().isEmpty())
+                {
+                    if(search.getText().toString().toLowerCase().contains("http://")||search.getText().toString().toLowerCase().contains("https://")) {
+                        ((MainActivity)getActivity()).addTab(search.getText().toString());
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains("www")) {
+                        String display = "http://"+search.getText().toString();
+                        search.setText(display);
+                        ((MainActivity)getActivity()).addTab(display);
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains(".fr")||search.getText().toString().toLowerCase().contains(".com")) {
+                        String display = "http://www."+search.getText().toString();
+                        search.setText(display);
+                        ((MainActivity)getActivity()).addTab(display);
+                        search.setText("");
+                    }
+                    else {
+                        ((MainActivity) getActivity()).addTab("https://www.google.fr/search?q=" + search.getText().toString());
+                        search.setText("");
+                    }
+
+                }
+            }
+        });
         assert mRecyclerView != null;
         mRecyclerView.setHasFixedSize(true);
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                /*final int fromPos = viewHolder.getAdapterPosition();
-                final int toPos = target.getAdapterPosition();
-                ArrayList<CustomWebViewFragment> list = ((MainActivity)getActivity()).getRawList();
-                CustomWebViewFragment temp = list.get(toPos);
-                list.set(toPos,list.get(fromPos));
-                list.set(fromPos,temp);
-                ((MainActivity)getActivity()).setTabList(list);
-                mAdapter.notifyItemMoved(fromPos,toPos);
-                return true; // true if moved
-                */
                 return false;
             }
 

@@ -1,6 +1,7 @@
 package com.gueg.browser;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -20,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -40,23 +43,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class CustomWebViewFragment extends WebViewFragment {
 
-    // TODO hide url bar
+    private OnPageLoadedListener mPageLoadedListener;
+    private OnMainActivityCallListener mMainActivityListener;
 
-    private OnPageLoadedListener mListener;
-    private OnNewTabListener mListener2;
     int MENU_CANCEL = 1;
     int MENU_NEWTABLINK = 2;
     int MENU_NEWTABIMAGE = 3;
     int MENU_DOWNLOADIMAGE = 4;
     int MENU_NEWTABLINK_BKG = 5;
 
-    // TODO + bloquer pubs
 
     View rootView;
     WebView web;
@@ -72,10 +71,19 @@ public class CustomWebViewFragment extends WebViewFragment {
 
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mMainActivityListener = (OnMainActivityCallListener) context;
+        } catch (ClassCastException castException) {
+            // The activity does not implement the listener.
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -115,7 +123,7 @@ public class CustomWebViewFragment extends WebViewFragment {
         btn_onglet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)getActivity()).setCurrentFragment(-1);
+                mMainActivityListener.onSetCurrentFragment(-1);
             }
         });
 
@@ -160,17 +168,7 @@ public class CustomWebViewFragment extends WebViewFragment {
         setOnPageLoadedListener(new OnPageLoadedListener() {
             @Override
             public void onPageLoaded(WebPage page) {
-                ((MainActivity)getActivity()).refreshTabs();
-            }
-        });
-        setOnNewTab(new OnNewTabListener() {
-            @Override
-            public void onNewTab(String url) {
-                ((MainActivity)getActivity()).addTab(url);
-            }
-            @Override
-            public void onNewTab(String url, int pos) {
-                ((MainActivity)getActivity()).addTab(url,pos);
+                mMainActivityListener.onRefresh();
             }
         });
 
@@ -191,6 +189,23 @@ public class CustomWebViewFragment extends WebViewFragment {
         final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         web.setWebChromeClient(new WebChromeClient() {
             @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                result.cancel();
+                return true;
+            }
+
+            @Override
+            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+                result.cancel();
+                return true;
+            }
+
+            @Override
+            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+                result.cancel();
+                return true;
+            }
+            @Override
             public void onProgressChanged(WebView view, int progress) {
                 progressBar.setMax(100);
                 progressBar.setProgressTintList(ColorStateList.valueOf(colorMain));
@@ -206,16 +221,19 @@ public class CustomWebViewFragment extends WebViewFragment {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 text.setText(title);
-                ((MainActivity)getActivity()).refreshTabs();
+                mMainActivityListener.onRefresh();
             }
             @Override
             public void onReceivedIcon(WebView view, Bitmap icon) {
                 image.setImageBitmap(icon);
-                ((MainActivity)getActivity()).refreshTabs();
+                mMainActivityListener.onRefresh();
             }
         });
 
-        web.loadUrl(homepage);
+
+
+        if(savedInstanceState==null)
+            web.loadUrl(homepage);
         WebSettings webSettings = web.getSettings();
         web.requestFocus();
 
@@ -252,11 +270,11 @@ public class CustomWebViewFragment extends WebViewFragment {
 
               @Override
               public void onPageFinished(WebView view, String url) {
-                  if (mListener != null)
-                      mListener.onPageLoaded(new WebPage(web.getTitle(), web.getUrl(), web.getFavicon()));
+                  if (mPageLoadedListener != null)
+                      mPageLoadedListener.onPageLoaded(new WebPage(web.getTitle(), web.getUrl(), web.getFavicon()));
 
 
-                  ((MainActivity)getActivity()).refreshCurrentUrls();
+                  mMainActivityListener.onRefresh();
 
               }
         });
@@ -273,13 +291,13 @@ public class CustomWebViewFragment extends WebViewFragment {
                             if(item.getItemId()==MENU_CANCEL)
                                 menu.close();
                             else if(item.getItemId()==MENU_NEWTABLINK) {
-                                mListener2.onNewTab(result.getExtra());
+                                mMainActivityListener.onNewTab(result.getExtra(),-1);
                             }
                             else if(item.getItemId()==MENU_NEWTABLINK_BKG) {
-                                mListener2.onNewTab(result.getExtra(),posFrag);
+                                mMainActivityListener.onNewTab(result.getExtra(),posFrag);
                             }
                             else if(item.getItemId()==MENU_NEWTABIMAGE) {
-                                mListener2.onNewTab(result.getExtra());
+                                mMainActivityListener.onNewTab(result.getExtra(),-1);
                             }
                             else if(item.getItemId()==MENU_DOWNLOADIMAGE) {
                                 Bitmap image = null;
@@ -374,11 +392,7 @@ public class CustomWebViewFragment extends WebViewFragment {
     }
 
     public void setOnPageLoadedListener(OnPageLoadedListener listener) {
-        mListener = listener;
-    }
-
-    public void setOnNewTab(OnNewTabListener listener) {
-        mListener2 = listener;
+        mPageLoadedListener = listener;
     }
 
 

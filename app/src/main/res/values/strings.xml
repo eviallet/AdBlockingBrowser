@@ -20,7 +20,8 @@
     <string name="pref_colorBarText">Couleur du texte de la barre d\'adresse</string>
     <string name="prefs_bookmarks_sort">Trier les favoris</string>
     <string name="prefs_share">Partager</string>
-    <string name="pref_adblock">Bloquer les pubs</string>
+    <string name="prefs_update">Vérifier les mises à jour</string>
+    <string name="prefs_adblock">Bloquer les pubs</string>
 
 
     <string name="pref_cat_general">Options générales</string>

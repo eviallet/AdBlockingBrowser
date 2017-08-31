@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -19,18 +20,19 @@ import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity {
-
-    // TODO -- network state
-    // TODO -- custom animations tabs
+public class MainActivity extends AppCompatActivity implements  OnMainActivityCallListener {
 
 
     int ACTIVITY_RESULTS_BTN_FAV_NEW = 1;
@@ -162,15 +164,17 @@ public class MainActivity extends AppCompatActivity {
         btn_fav.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Intent intent = new Intent(MainActivity.this,BookmarkSortActivity.class);
-                Bundle bundle = new Bundle();
-                ArrayList<String> bookmarksListString = new ArrayList<>(bookmarksList.size());
-                for(int i=0; i<bookmarksList.size(); i++) {
-                    bookmarksListString.add(bookmarksList.get(i).getName());
+                if(fragments.size()!=0) {
+                    Intent intent = new Intent(MainActivity.this, BookmarkSortActivity.class);
+                    Bundle bundle = new Bundle();
+                    ArrayList<String> bookmarksListString = new ArrayList<>(bookmarksList.size());
+                    for (int i = 0; i < bookmarksList.size(); i++) {
+                        bookmarksListString.add(bookmarksList.get(i).getName());
+                    }
+                    bundle.putSerializable("BOOKMARKS_LIST", bookmarksListString);
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent, ACTIVITY_RESULTS_BTN_FAV_SORT);
                 }
-                bundle.putSerializable("BOOKMARKS_LIST", bookmarksListString);
-                intent.putExtras(bundle);
-                startActivityForResult(intent,ACTIVITY_RESULTS_BTN_FAV_SORT);
                 return true;
             }
         });
@@ -180,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
-                if(!getCurrentFragment().getTag().equals("-1")) {
+                if(fragments.size()>0&&!getCurrentFragment().getTag().equals("-1")) {
                     if (getCurrentFragment().getWeb().canGoForward()) {
                         getCurrentFragment().getWeb().goForward();
                         assert dl != null;
@@ -234,6 +238,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final EditText search = (EditText) findViewById(R.id.drawer_search);
+
+        search.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if(search.getText().toString().toLowerCase().contains("http://")||search.getText().toString().toLowerCase().contains("https://")) {
+                        addTab(search.getText().toString());
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains("www")) {
+                        String display = "http://"+search.getText().toString();
+                        search.setText(display);
+                        addTab(display);
+                        search.setText("");
+                    }
+                    else if(search.getText().toString().toLowerCase().contains(".fr")||search.getText().toString().toLowerCase().contains(".com")) {
+                        String display = "http://www."+search.getText().toString();
+                        search.setText(display);
+                        addTab(display);
+                        search.setText("");
+                    }
+                    else {
+                        addTab("https://www.google.fr/search?q=" + search.getText().toString());
+                        search.setText("");
+                    }
+
+                }
+                return false;
+            }
+        });
+
 
         // =================================== FRAGMENTS
 
@@ -242,13 +280,22 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefUrls = getSharedPreferences(getString(R.string.urls_list_key),Context.MODE_PRIVATE);
 
         if(!loadCurrentUrls()) {
-            addTab();
+            //addTab();
+        }
+
+        Uri startIntentData = getIntent().getData();
+        if(startIntentData!=null) {
+            String intentUrl = startIntentData.toString();
+            if(intentUrl.contains("http://")||intentUrl.contains("https://")) {
+                addTab(intentUrl);
+            }
         }
 
         if (getIntent().getExtras() != null) {
             if (getIntent().getStringExtra("LINK")!=null) {
                 addTab(getIntent().getStringExtra("LINK"));
             }}
+
 
     }   // onCreate
 
@@ -263,7 +310,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // TODO back -1
         DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
         assert dl != null;
         if(dl.isDrawerOpen(GravityCompat.START))
@@ -392,11 +438,9 @@ public class MainActivity extends AppCompatActivity {
         manager.executePendingTransactions();
 
 
-        setCurrentFragment(fragment);
-
         fragment.setPos(fragments.size());
 
-        setCurrentFragment(posCurTab);
+        setCurrentFragment(getCurrentFragment());
         writeCurrentUrls();
 
     }
@@ -411,14 +455,18 @@ public class MainActivity extends AppCompatActivity {
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 
-        transaction.remove(fragments.get(pos));
+        if(pos<fragments.size()) {
+            transaction.remove(fragments.get(pos));
 
-        fragments.remove(pos);
+            fragments.remove(pos);
+        /*
         if(fragments.size()==0||fragments.size()==-1)
             addTab();
-        transaction.commit();
-        manager.executePendingTransactions();
-        writeCurrentUrls();
+            */
+            transaction.commit();
+            manager.executePendingTransactions();
+            writeCurrentUrls();
+        }
     }
     public void closeTab(CustomWebViewFragment frag) {
         android.app.FragmentManager manager = getFragmentManager();
@@ -427,8 +475,10 @@ public class MainActivity extends AppCompatActivity {
         transaction.remove(frag);
 
         fragments.remove(fragments.indexOf(frag));
+        /*
         if(fragments.size()==0||fragments.size()==-1)
             addTab();
+            */
         transaction.commit();
         manager.executePendingTransactions();
         writeCurrentUrls();
@@ -442,10 +492,11 @@ public class MainActivity extends AppCompatActivity {
             transaction.remove(fragments.get(i));
 
         fragments.clear();
-        addTab();
+        //addTab();
         transaction.commit();
         manager.executePendingTransactions();
-        writeCurrentUrls();
+        currentUrls.clear();
+        tab_manager.getAdapter().notifyDataSetChanged();
     }
 
     public void setCurrentFragment(int pos) {
@@ -481,37 +532,40 @@ public class MainActivity extends AppCompatActivity {
         manager.executePendingTransactions();
     }
 
+    @Override
+    public void onRefresh() {
+        refreshTabs();
+        refreshCurrentUrls();
+    }
+
+    @Override
+    public void onSetCurrentFragment(int posFrag) {
+        setCurrentFragment(posFrag);
+    }
+
+    @Override
+    public void onNewTab(String url, int pos) {
+        if(pos==-1)
+            addTab(url);
+        else
+            addTab(url,pos);
+    }
 
     public ArrayList<WebPage> getTabList() {
 
         ArrayList<WebPage> list = new ArrayList<>();
-        for(int i=0; i<fragments.size();i++)
-        {
+        for (int i = 0; i < fragments.size(); i++) {
             WebView web = fragments.get(i).getWeb();
             WebPage page;
-            if(web!=null) {
-                page = new WebPage(web.getTitle(),web.getUrl(),web.getFavicon());
-            }
-            else {
-                page = new WebPage("Google","http://www.google.fr",null);
+            if (web != null) {
+                page = new WebPage(web.getTitle(), web.getUrl(), web.getFavicon());
+            } else {
+                page = new WebPage("Google", "http://www.google.fr", null);
             }
             list.add(page);
         }
         return list;
     }
-
-    /*
-    public ArrayList<CustomWebViewFragment> getRawList() {
-        return fragments;
-    }
-
-    public void setTabList(ArrayList<CustomWebViewFragment> newList) {
-        fragments = newList;
-    }
-    */
-
-
-
 
 
 
@@ -524,7 +578,7 @@ public class MainActivity extends AppCompatActivity {
     public void writeCurrentUrls() {
         SharedPreferences.Editor editor = sharedPrefUrls.edit();
         String key,value;
-        editor.putInt(getString(R.string.urls_list_size),bookmarksList.size());
+        editor.putInt(getString(R.string.urls_list_size),currentUrls.size());
         for(int i=0; i<currentUrls.size();i++) {
             key = getString(R.string.urls_list_item)+Integer.toString(i);
             value = currentUrls.get(i);
@@ -730,5 +784,6 @@ public class MainActivity extends AppCompatActivity {
             }*/
         }
     }
+
 
 }

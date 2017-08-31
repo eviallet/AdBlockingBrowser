@@ -8,9 +8,8 @@ android {
         applicationId "com.gueg.browser"
         minSdkVersion 21
         targetSdkVersion 25
-        multiDexEnabled true
-        versionCode 2
-        versionName "1.1"
+        versionCode 5
+        versionName "1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
