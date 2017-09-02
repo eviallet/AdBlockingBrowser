@@ -1,6 +1,7 @@
 package com.gueg.browser;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,8 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -41,6 +44,14 @@ public class TabCardsFragment extends Fragment {
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         ImageButton tab_add = (ImageButton) rootView.findViewById(R.id.btn_tab_add);
         final EditText search = (EditText) rootView.findViewById(R.id.fragment_default_search);
+        ImageView logo = (ImageView) rootView.findViewById(R.id.fragment_default_logo);
+
+        logo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.animate().rotation(360).setDuration(5000).start();
+            }
+        });
 
         search.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -69,6 +80,11 @@ public class TabCardsFragment extends Fragment {
                         search.setText("");
                     }
 
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
                 }
                 return false;
             }
@@ -99,6 +115,11 @@ public class TabCardsFragment extends Fragment {
                     else {
                         ((MainActivity) getActivity()).addTab("https://www.google.fr/search?q=" + search.getText().toString());
                         search.setText("");
+                    }
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                     }
 
                 }

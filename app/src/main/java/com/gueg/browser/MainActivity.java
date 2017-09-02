@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -132,7 +133,10 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         bookmarksDrawer.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, bookmarksDrawer ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {    // load in current tab
-                        getCurrentFragment().loadUrl(bookmarksList.get(position).getUrl());
+                        if(fragments.size()!=0)
+                            getCurrentFragment().loadUrl(bookmarksList.get(position).getUrl());
+                        else
+                            addTab(bookmarksList.get(position).getUrl());
                         DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
                         assert dl != null;
                         dl.closeDrawer(GravityCompat.START);
@@ -157,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         btn_fav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                newBookmark();
+                if(fragments.size()>0)
+                    newBookmark();
             }
         });
         btn_fav.setLongClickable(true);
@@ -204,16 +209,8 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
             @Override
             public void onClick(View v) {
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
-                if(getCurrentFragment().getWebView().canGoForward()) {
-                    getCurrentFragment().getWebView().goForward();
-                    assert dl != null;
-                    if (!getCurrentFragment().getWebView().canGoForward() && dl.isDrawerOpen(GravityCompat.START))
-                        dl.closeDrawer(GravityCompat.START);
-                }
-                else {
-                    assert dl != null;
-                    dl.closeDrawer(GravityCompat.START);
-                }
+                assert dl != null;
+                dl.closeDrawer(GravityCompat.START);
                 Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
                 startActivity(intent);
             }
@@ -266,6 +263,13 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                         addTab("https://www.google.fr/search?q=" + search.getText().toString());
                         search.setText("");
                     }
+                    View view = getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                    DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
+                    dl.closeDrawer(GravityCompat.START);
 
                 }
                 return false;
@@ -279,9 +283,9 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
 
         sharedPrefUrls = getSharedPreferences(getString(R.string.urls_list_key),Context.MODE_PRIVATE);
 
-        if(!loadCurrentUrls()) {
-            //addTab();
-        }
+        loadCurrentUrls();
+
+        setCurrentFragment(-1);
 
         Uri startIntentData = getIntent().getData();
         if(startIntentData!=null) {
@@ -402,27 +406,6 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         writeCurrentUrls();
     }
 
-    public void addTab(String url, Fragment frag) {
-        android.app.FragmentManager manager = getFragmentManager();
-        android.app.FragmentTransaction transaction = manager.beginTransaction();
-
-        CustomWebViewFragment fragment = new CustomWebViewFragment();
-        fragments.add(fragment);
-        transaction.add(R.id.fragment_container,fragment,"frag"+Integer.toString(fragments.size()));
-        transaction.commit();
-        manager.executePendingTransactions();
-
-        fragment.setPos(fragments.size());
-        fragment.setOnStartUrl(url);
-
-        if(frag.getTag().equals("-1")) {
-            setCurrentFragment(-1);
-        }
-        else
-            setCurrentFragment((CustomWebViewFragment) frag);
-
-        writeCurrentUrls();
-    }
 
     public void addTab(String url, int posCurTab) {
         android.app.FragmentManager manager = getFragmentManager();
@@ -452,20 +435,18 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
 
 
     public void closeTab(int pos) {
-        android.app.FragmentManager manager = getFragmentManager();
-        android.app.FragmentTransaction transaction = manager.beginTransaction();
-
         if(pos<fragments.size()) {
+            android.app.FragmentManager manager = getFragmentManager();
+            android.app.FragmentTransaction transaction = manager.beginTransaction();
             transaction.remove(fragments.get(pos));
 
             fragments.remove(pos);
-        /*
-        if(fragments.size()==0||fragments.size()==-1)
-            addTab();
-            */
             transaction.commit();
             manager.executePendingTransactions();
+            refreshCurrentUrls();
             writeCurrentUrls();
+            tab_manager.getAdapter().refresh(getTabList());
+
         }
     }
     public void closeTab(CustomWebViewFragment frag) {
@@ -475,13 +456,11 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         transaction.remove(frag);
 
         fragments.remove(fragments.indexOf(frag));
-        /*
-        if(fragments.size()==0||fragments.size()==-1)
-            addTab();
-            */
         transaction.commit();
         manager.executePendingTransactions();
+        refreshCurrentUrls();
         writeCurrentUrls();
+        tab_manager.getAdapter().refresh(getTabList());
     }
 
     public void closeAllTabs() {
@@ -496,7 +475,8 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         transaction.commit();
         manager.executePendingTransactions();
         currentUrls.clear();
-        tab_manager.getAdapter().notifyDataSetChanged();
+        writeCurrentUrls();
+        tab_manager.getAdapter().refresh(null);
     }
 
     public void setCurrentFragment(int pos) {
