@@ -38,8 +38,9 @@ public class ShortcutHandler extends FragmentActivity {
                 Intent shortcut = new Intent();
                 shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, toLaunchOnShortcut);
                 shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME,title);
-                shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,icon);
+                shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON,icon);
                 setResult(Activity.RESULT_OK, shortcut);
+                finishAndRemoveTask();
             }
         }
     }

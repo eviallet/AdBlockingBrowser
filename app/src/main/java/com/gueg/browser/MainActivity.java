@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
     BookmarksCardsAdapter mAdapter;
     RecyclerView bookmarksDrawer;
     SharedPreferences sharedPrefFavs;
+    ImageButton btn_tabs;
     SharedPreferences sharedPrefUrls;
     private static final int VERTICAL_ITEM_SPACE = 15;
 
@@ -68,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-
 
 
         // Shared prefs listener
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
 
         ImageButton btn_fav = (ImageButton) findViewById(R.id.btn_drawer_favoris);
         ImageButton btn_next = (ImageButton) findViewById(R.id.btn_drawer_suivant);
-        ImageButton btn_tabs = (ImageButton) findViewById(R.id.btn_drawer_onglets);
+        btn_tabs = (ImageButton) findViewById(R.id.btn_drawer_onglets);
         ImageButton btn_settings = (ImageButton) findViewById(R.id.btn_drawer_parametres);
         assert btn_fav != null;
         btn_fav.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                 return true;
             }
         });
+        btn_fav.setImageDrawable(getDrawable(R.drawable.star));
 
         assert btn_next != null;
         btn_next.setOnClickListener(new View.OnClickListener() {
@@ -217,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                 }
             }
         });
+        btn_next.setImageDrawable(getDrawable(R.drawable.right));
 
         assert btn_settings != null;
         btn_settings.setOnClickListener(new View.OnClickListener() {
@@ -231,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         });
 
         assert btn_tabs != null;
+        if(getIntent().getBooleanExtra("SHORTCUT",false))
+            btn_tabs.setImageDrawable(getDrawable(R.drawable.check_mark));
         btn_tabs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -241,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                     if (!getCurrentFragment().getTag().equals("-1")) {
                         WebPage page = getCurrentFragment().getWebPage();
                         if (page.getPic() != null) {
-                            Bitmap icon = Bitmap.createScaledBitmap(page.getPic(), 128, 128, true);
+                            Bitmap icon = Bitmap.createScaledBitmap(page.getPic(), 248, 248, true);
                             new DbBitmapUtility();
                             byte[] pic = DbBitmapUtility.getBytes(icon);
 
@@ -255,6 +259,15 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                             Toast.makeText(MainActivity.this, "Reccourci crée !", Toast.LENGTH_SHORT).show();
                         } else
                             Toast.makeText(MainActivity.this, "Chargement de l'image du site...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
+                    if (!getCurrentFragment().getTag().equals("-1")) {
+                        boolean isMobile = getCurrentFragment().toggleUserAgent();
+                        if(isMobile)
+                            btn_tabs.setImageDrawable(getDrawable(R.drawable.smartphone));
+                        else
+                            btn_tabs.setImageDrawable(getDrawable(R.drawable.mouse));
                     }
                 }
             }
@@ -521,9 +534,15 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                 transaction.hide(fragments.get(i));
             transaction.hide(manager.findFragmentByTag("-1"));
             transaction.show(fragments.get(pos));
+            if(fragments.get(pos).getUserAgent())
+                btn_tabs.setImageDrawable(getDrawable(R.drawable.smartphone));
+            else
+                btn_tabs.setImageDrawable(getDrawable(R.drawable.mouse));
+
         }
         transaction.commit();
         manager.executePendingTransactions();
+
     }
 
     public void setCurrentFragment(CustomWebViewFragment frag) {
@@ -533,6 +552,10 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         for(int i=0; i<fragments.size(); i++)
             transaction.hide(fragments.get(i));
         transaction.show(frag);
+        if(frag.getUserAgent())
+            btn_tabs.setImageDrawable(getDrawable(R.drawable.smartphone));
+        else
+            btn_tabs.setImageDrawable(getDrawable(R.drawable.mouse));
         transaction.commit();
         manager.executePendingTransactions();
     }

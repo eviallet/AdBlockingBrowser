@@ -57,6 +57,9 @@ public class CustomWebViewFragment extends WebViewFragment {
     int MENU_DOWNLOADIMAGE = 4;
     int MENU_NEWTABLINK_BKG = 5;
 
+    boolean userAgentMobile = true;
+    String userAgentDefault;
+
 
     SharedPreferences mainPref;
     View rootView;
@@ -316,7 +319,26 @@ public class CustomWebViewFragment extends WebViewFragment {
 
             });
 
+        userAgentDefault = web.getSettings().getUserAgentString();
+
         return rootView;
+    }
+
+    public boolean toggleUserAgent() {
+        if (userAgentMobile) {
+            web.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+            userAgentMobile = false;
+            web.reload();
+        } else {
+            web.getSettings().setUserAgentString(userAgentDefault);
+            userAgentMobile = true;
+            web.reload();
+        }
+        return userAgentMobile;
+    }
+
+    public boolean getUserAgent() {
+        return userAgentMobile;
     }
 
 
