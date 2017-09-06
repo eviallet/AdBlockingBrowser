@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
     }
 
 
-    public void addTab(String url, int posCurTab) {
+    public void addTab(String url, @SuppressWarnings("UnusedParameters") int posCurTab) {
         android.app.FragmentManager manager = getFragmentManager();
         android.app.FragmentTransaction transaction = manager.beginTransaction();
 

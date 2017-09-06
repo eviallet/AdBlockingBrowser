@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebResourceResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -15,11 +14,11 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AdBlocker {
+class AdBlocker {
     private static final String AD_HOSTS_FILE = "pgl.yoyo.org.txt";
     private static final Set<String> AD_HOSTS = new HashSet<>();
 
-    public static void init(final Context context) {
+    static void init(final Context context) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -45,10 +44,7 @@ public class AdBlocker {
         }
     }
     static boolean isAd(String url) {
-        if(TextUtils.isEmpty(url)) {
-            return false;
-        }
-        return isAdHost(url);
+        return !TextUtils.isEmpty(url) && isAdHost(url);
     }
 
     private static boolean isAdHost(String url) {

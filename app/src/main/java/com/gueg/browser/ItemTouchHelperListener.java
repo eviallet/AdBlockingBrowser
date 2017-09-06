@@ -1,5 +1,5 @@
 package com.gueg.browser;
 
-public interface ItemTouchHelperListener {
+interface ItemTouchHelperListener {
     void onItemMove(int fromPosition, int toPosition);
 }

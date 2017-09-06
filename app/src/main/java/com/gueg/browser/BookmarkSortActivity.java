@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import java.util.ArrayList;
 
+@SuppressWarnings("unchecked")
 public class BookmarkSortActivity extends Activity {
     private static final int VERTICAL_ITEM_SPACE = 15;
     @Override

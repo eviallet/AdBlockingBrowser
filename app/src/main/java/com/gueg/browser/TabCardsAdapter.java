@@ -51,7 +51,7 @@ class TabCardsAdapter extends RecyclerView.Adapter<TabCardsAdapter.ViewHolder> {
         return mList.size();
     }
 
-    public void refresh(ArrayList<WebPage> list) {
+    void refresh(ArrayList<WebPage> list) {
         mList.clear();
         if(list!=null)
             mList.addAll(list);
