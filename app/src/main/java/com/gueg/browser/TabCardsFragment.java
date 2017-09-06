@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class TabCardsFragment extends Fragment {
+public class TabCardsFragment extends Fragment implements View.OnFocusChangeListener {
 
     RecyclerView mRecyclerView;
     TabCardsAdapter mAdapter;
@@ -29,6 +29,7 @@ public class TabCardsFragment extends Fragment {
 
     View rootView;
     ArrayList<WebPage> list;
+    EditText search;
 
 
 
@@ -43,7 +44,7 @@ public class TabCardsFragment extends Fragment {
         list = ((MainActivity)getActivity()).getTabList();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         ImageButton tab_add = (ImageButton) rootView.findViewById(R.id.btn_tab_add);
-        final EditText search = (EditText) rootView.findViewById(R.id.fragment_default_search);
+        search = (EditText) rootView.findViewById(R.id.fragment_default_search);
         ImageView logo = (ImageView) rootView.findViewById(R.id.fragment_default_logo);
 
         logo.setOnClickListener(new View.OnClickListener() {
@@ -199,10 +200,22 @@ public class TabCardsFragment extends Fragment {
             }
         });
 
+
         return rootView;
     }
 
 
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if(hasFocus) {
+            if(!search.hasFocus())
+                search.requestFocus();
+        } else {
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
 
     @Override
     public void onPause() {

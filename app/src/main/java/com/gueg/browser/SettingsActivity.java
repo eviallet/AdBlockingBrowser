@@ -11,6 +11,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 
+@SuppressWarnings("deprecation")
 public class SettingsActivity extends PreferenceActivity {
 
     @Override
@@ -40,7 +41,6 @@ public class SettingsActivity extends PreferenceActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
-            //int verCode = pInfo.versionCode;
             btn_update.setSummary(version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -54,6 +54,40 @@ public class SettingsActivity extends PreferenceActivity {
                 return true;
             }
         });
+
+        Preference colorMain = findPreference("prefColorMain");
+        Preference colorBarText = findPreference("prefColorBarText");
+        Preference colorBar = findPreference("prefColorBar");
+
+
+        colorMain.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                prefs.edit().putInt("prefColorMain",(int)newValue).apply();
+                return true;
+            }
+        });
+
+        colorBarText.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                prefs.edit().putBoolean("prefColorBarText",(boolean)newValue).apply();
+                return true;
+            }
+        });
+
+        colorBar.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                prefs.edit().putInt("prefColorBar",(int)newValue).apply();
+                return true;
+            }
+        });
+
+
 
     }
 

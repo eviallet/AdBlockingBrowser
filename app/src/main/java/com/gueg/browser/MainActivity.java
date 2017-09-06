@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
@@ -49,7 +49,15 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
     SharedPreferences sharedPrefUrls;
     private static final int VERTICAL_ITEM_SPACE = 15;
 
-
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                    if (key.equals("color")) {
+                        refreshColor();
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+
+
+        // Shared prefs listener
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
         // Fragments
 
@@ -223,15 +237,26 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                 DrawerLayout dl = (DrawerLayout)findViewById(R.id.drawer_layout);
                 assert dl != null;
                 dl.closeDrawer(GravityCompat.START);
-                setCurrentFragment(-1);
-            }
-        });
-        btn_tabs.setLongClickable(true);
-        btn_tabs.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                endMainActivity();
-                return true;
+                if(getIntent().getBooleanExtra("SHORTCUT",false)) {
+                    if (!getCurrentFragment().getTag().equals("-1")) {
+                        WebPage page = getCurrentFragment().getWebPage();
+                        if (page.getPic() != null) {
+                            Bitmap icon = Bitmap.createScaledBitmap(page.getPic(), 128, 128, true);
+                            new DbBitmapUtility();
+                            byte[] pic = DbBitmapUtility.getBytes(icon);
+
+                            Intent result = new Intent();
+                            result.putExtra("shortcut_title",page.getTitle());
+                            result.putExtra("shortcut_url",page.getUrl());
+                            result.putExtra("shortcut_pic",pic);
+                            setResult(Activity.RESULT_OK, result);
+
+
+                            Toast.makeText(MainActivity.this, "Reccourci crée !", Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(MainActivity.this, "Chargement de l'image du site...", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
@@ -601,6 +626,17 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
 
 
 
+    @SuppressWarnings("deprecation")
+    private void refreshColor() {
+        for(CustomWebViewFragment f : fragments) {
+            f.refreshColor();
+        }
+    }
+
+
+
+
+
 
 
 
@@ -672,7 +708,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
             editor.putString(key,value);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bookmarksList.get(i).getPic().compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
+            bookmarksList.get(i).getPic().compress(Bitmap.CompressFormat.PNG, 100, baos);
             byte[] b = baos.toByteArray();
             String encoded = Base64.encodeToString(b, Base64.DEFAULT);
 
@@ -723,6 +759,7 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
 
 
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -746,7 +783,8 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
                 Bundle results = data.getExtras();
                 ArrayList<String> bookmarkListString = (ArrayList<String>) results.getSerializable("BOOKMARKS_LIST");
 
-                for(int i=0; i<bookmarkListString.size(); i++) {
+                assert bookmarkListString != null;
+                for(int i = 0; i<bookmarkListString.size(); i++) {
                     for(int j=0; j<bookmarksList.size(); j++) {
                         if(bookmarkListString.get(i).equals(bookmarksList.get(j).getName())) {
                             Bookmark temp = bookmarksList.get(j);
@@ -764,6 +802,15 @@ public class MainActivity extends AppCompatActivity implements  OnMainActivityCa
             }*/
         }
     }
+
+
+    @Override
+    public void onDestroy() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
+        super.onDestroy();
+    }
+
 
 
 }

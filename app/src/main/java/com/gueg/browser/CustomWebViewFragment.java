@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,6 +46,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
+@SuppressWarnings("deprecation")
 public class CustomWebViewFragment extends WebViewFragment {
 
     private OnPageLoadedListener mPageLoadedListener;
@@ -57,11 +59,13 @@ public class CustomWebViewFragment extends WebViewFragment {
     int MENU_NEWTABLINK_BKG = 5;
 
 
+    SharedPreferences mainPref;
     View rootView;
     WebView web;
     EditText text;
     ImageView image;
     ImageButton btn_onglet;
+    RelativeLayout rel;
     int posFrag;
     private String toLoad;
     String homepage;
@@ -91,31 +95,17 @@ public class CustomWebViewFragment extends WebViewFragment {
         rootView = inflater.inflate(R.layout.fragment_webview, container, false);
         super.onCreateView(inflater,container,savedInstanceState);
         web = (WebView) rootView.findViewById(R.id.webView);
-        RelativeLayout rel = (RelativeLayout) rootView.findViewById(R.id.relatLayoutWeb);
+        rel = (RelativeLayout) rootView.findViewById(R.id.relatLayoutWeb);
         text = (EditText) rootView.findViewById(R.id.webViewText);
         image = (ImageView) rootView.findViewById(R.id.imageViewWeb);
         btn_onglet = (ImageButton) rootView.findViewById(R.id.cwvTabs);
 
         AdBlocker.init(getActivity());
 
-        SharedPreferences mainPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        homepage = mainPref.getString("prefHomepage","http://www.google.fr");
-        colorMain = mainPref.getInt("prefColorMain",R.color.colorPrimary);
-        colorBar =  mainPref.getInt("prefColorBar",R.color.colorTextWebView);
-
-        rel.setBackgroundTintList(ColorStateList.valueOf(colorBar));
-        text.setBackgroundTintList(ColorStateList.valueOf(colorBar));
-        image.setBackgroundTintList(ColorStateList.valueOf(colorBar));
-        btn_onglet.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        mainPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        refreshColor();
 
         blockAds = mainPref.getBoolean("prefAdBlock",true);
-
-        boolean isChecked = mainPref.getBoolean("prefColorBarText",true);
-
-        if(isChecked)
-            text.setTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorTextBlack)));
-        else
-            text.setTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorTextWhite)));
 
 
 
@@ -328,6 +318,25 @@ public class CustomWebViewFragment extends WebViewFragment {
             });
 
         return rootView;
+    }
+
+
+    public void refreshColor() {
+        homepage = mainPref.getString("prefHomepage","http://www.google.fr");
+        colorMain = mainPref.getInt("prefColorMain",0xffffffff);
+        colorBar =  mainPref.getInt("prefColorBar",0xffffffff);
+
+        rel.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        text.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        image.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+        btn_onglet.setBackgroundTintList(ColorStateList.valueOf(colorBar));
+
+        boolean isChecked = mainPref.getBoolean("prefColorBarText",true);
+
+        if(isChecked)
+            text.setTextColor(ColorStateList.valueOf(0xff000000));
+        else
+            text.setTextColor(ColorStateList.valueOf(0xffffffff));
     }
 
 
