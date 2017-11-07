@@ -9,9 +9,13 @@
     </style>
 
     <style name="BrowserTheme" parent="Theme.AppCompat.Light.NoActionBar" >
-        <item name="android:colorAccent">@color/accent_material_light</item>
+        <item name="colorControlNormal">@color/colorDivider</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="D" parent="android:Theme.Material.NoActionBar.Fullscreen" />
+
+    <style name="ProgressDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert"/>
 
 </resources>

@@ -15,13 +15,16 @@
 
     // Settings
     <string name="pref_homepage">Page d\'accueil</string>
-    <string name="pref_colorMain">Couleur générale</string>
+    <string name="pref_colorMain">Couleur du chargement</string>
     <string name="pref_colorBar">Couleur de la barre d\'adresse</string>
     <string name="pref_colorBarText">Couleur du texte de la barre d\'adresse</string>
     <string name="prefs_bookmarks_sort">Trier les favoris</string>
     <string name="prefs_share">Partager</string>
     <string name="prefs_update">Vérifier les mises à jour</string>
     <string name="prefs_adblock">Bloquer les pubs</string>
+    <string name="prefs_hidekeyboard">Cacher le clavier au démarrage</string>
+    <string name="prefs_savetabs">Garder les onglets ouverts en mémoire</string>
+    <string name="prefs_hidebar">Masquer automatiquement la barre</string>
 
 
     <string name="pref_cat_general">Options générales</string>
@@ -41,6 +44,11 @@
     <string name="urls_list_size">com.gueg.browser.URLS_LIST_SIZE</string>
     <string name="urls_list_item">com.gueg.browser.URLS_LIST_ITEM_</string>
 
+    <string-array name="history_pref">
+        <item>"Désactivé"</item>
+        <item>"Par session"</item>
+        <item>"Permanent"</item>
+    </string-array>
 
 
 

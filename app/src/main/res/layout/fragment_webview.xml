@@ -1,69 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:background="@color/colorDrawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
 
     <RelativeLayout
         android:id="@+id/relatLayoutWeb"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="43dp"
         android:orientation="horizontal"
         android:background="@color/colorTextWebView"
         android:weightSum="1">
 
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/progressAnim"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="2dp"
+            style="@style/SpinKitView.ChasingDots"
+            app:SpinKit_Color="@color/colorTextWebView"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="2dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp" />
         <ImageView
-        android:id="@+id/imageViewWeb"
-        android:layout_marginStart="4dp"
-        android:background="@color/colorTextWebView"
-        android:layout_alignParentStart="true"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        tools:ignore="ContentDescription"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp" />
+            android:id="@+id/imageViewWeb"
+            android:layout_marginStart="4dp"
+            android:background="@color/colorTextWebView"
+            android:layout_alignParentStart="true"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            tools:ignore="ContentDescription"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp" />
 
-        <EditText
-        android:id="@+id/webViewText"
-        android:layout_width="wrap_content"
-        android:layout_toEndOf="@id/imageViewWeb"
-        android:background="@color/colorTextWebView"
-        android:layout_height="match_parent"
-        android:maxLength="50"
-        android:textSize="21sp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:inputType="textNoSuggestions"
-        android:hint=""
-        android:layout_centerVertical="true" />
 
         <ImageButton
-        android:id="@+id/cwvTabs"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
-        android:background="@color/colorTextWebView"
-        app:srcCompat="@mipmap/ic_dots2"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        tools:ignore="ContentDescription" />
+            android:id="@+id/cwvTabs"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorTextWebView"
+            app:srcCompat="@drawable/squares"
+            android:scaleType="centerInside"
+            android:padding="9dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            tools:ignore="ContentDescription" />
+        <EditText
+            android:id="@+id/webViewText"
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@id/imageViewWeb"
+            android:layout_toStartOf="@id/cwvTabs"
+            android:background="@color/colorTextWebView"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:inputType="textNoSuggestions"
+            android:hint=""
+            android:layout_centerVertical="true" />
 
     </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
+        android:layout_below="@id/relatLayoutWeb"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@color/colorTextWebView"
         android:progress="0"/>
+    <RelativeLayout
+        android:id="@+id/webfindonpagelayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:visibility="gone"
+        android:background="@color/colorLVBackground"
+        android:layout_below="@id/relatLayoutWeb">
+        <ImageButton
+            android:id="@+id/webfindonpagecancel"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cancel"/>
+        <ImageButton
+            android:id="@+id/webfindonpageprev"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:src="@drawable/previous"
+            android:layout_marginEnd="5dp"
+            android:scaleType="fitCenter"
+            android:layout_toEndOf="@id/webfindonpagecancel"/>
+        <ImageButton
+            android:id="@+id/webfindonpagenext"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/next"
+            android:layout_alignParentEnd="true"/>
+        <EditText
+            android:id="@+id/webfindonpage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_toEndOf="@id/webfindonpageprev"
+            android:layout_toStartOf="@id/webfindonpagenext"/>
+
+    </RelativeLayout>
 
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true">
     </WebView>
 
-</LinearLayout>
+</RelativeLayout>

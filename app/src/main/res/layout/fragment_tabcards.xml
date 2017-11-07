@@ -42,32 +42,46 @@
             android:inputType="textPersonName"
             android:hint="Rechercher..."/>
     </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/fragment_tabcards_ll"
+        android:layout_height="75dp"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal"
+        android:gravity="center|bottom"
+        android:layout_alignParentBottom="true">
+        <ImageButton
+            android:id="@+id/btn_tab_undo"
+            android:src="@drawable/tab_undo"
+            android:scaleType="fitXY"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="75dp"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/btn_tab_rem"
+            android:src="@drawable/tab_rem"
+            android:scaleType="fitXY"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="75dp"
+            android:background="@null"/>
+
+        <ImageButton
+            android:id="@+id/btn_tab_add"
+            android:src="@drawable/tab_add"
+            android:scaleType="fitXY"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@null" />
+    </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_below="@id/relat"
+        android:layout_above="@id/fragment_tabcards_ll"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp"
         android:clipToPadding="false" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:orientation="horizontal"
-        android:gravity="center|bottom"
-        android:layout_alignParentBottom="true">
-        <ImageButton
-            android:id="@+id/btn_tab_rem"
-            android:src="@mipmap/ic_rem_tab"
-            android:layout_width="140dp"
-            android:layout_height="75dp"
-            android:background="@null"/>
-
-        <ImageButton
-            android:id="@+id/btn_tab_add"
-            android:layout_width="140dp"
-            android:layout_height="75dp"
-            android:background="@null"
-            android:src="@mipmap/ic_add_tab" />
-    </LinearLayout>
 </RelativeLayout>

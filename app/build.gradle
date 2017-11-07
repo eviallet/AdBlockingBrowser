@@ -2,15 +2,17 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.gueg.browser"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
+        renderscriptTargetApi 26
+        renderscriptSupportModeEnabled true
         multiDexEnabled true
-        versionCode 7
-        versionName "1.4.2"
+        versionCode 28
+        versionName "1.7.14"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -38,20 +40,21 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.firebase:firebase-messaging:10.0.1'
-    compile 'com.google.firebase:firebase-crash:10.0.1'
-    compile 'com.android.support:cardview-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.github.yukuku:ambilwarna:2.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(":ColorPicker")
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:cardview-v7:26.+'
+    compile 'com.android.support:recyclerview-v7:26.+'
+    compile 'fr.tvbarthel.blurdialogfragment:lib:2.2.0'
+    compile 'com.github.yukuku:ambilwarna:2.0.1'
+    compile 'com.github.ybq:Android-SpinKit:1.1.0'
+    compile 'com.azoft.carousellayoutmanager:carousel:1.2.1'
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.leocardz:link-preview:2.0.0@aar'
+    compile 'com.koushikdutta.urlimageviewhelper:urlimageviewhelper:1.0.4'
+    compile 'com.google.firebase:firebase-crash:10.0.1'
     testCompile 'junit:junit:4.12'
 }
-
-
 
 
 apply plugin: 'com.google.gms.google-services'

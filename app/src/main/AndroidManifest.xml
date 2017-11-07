@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +15,7 @@
         android:windowSoftInputMode="stateHidden|adjustResize"
         android:theme="@style/BrowserTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,22 +29,23 @@
                 <data android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".BookmarkActivity" />
-        <activity android:name=".BookmarkSortActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".ShortcutHandler" >
+        <activity android:name=".web.bookmarks.BookmarkSortActivity" />
+        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.ShortcutHandler" >
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <service android:name=".FirebasePushNotification"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
+        <provider
+            android:name=".update.GenericFileProvider"
+            android:authorities="${applicationId}.com.gueg.browser.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
     </application>
 
