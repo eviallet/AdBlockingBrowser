@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:padding="5dp">
+
+    <ImageView
+        android:id="@+id/row_rss_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"/>
+    <TextView
+        android:id="@+id/row_rss_text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:text="01/01\n16:54"
+        android:textColor="@color/colorTextBlack"
+        android:textSize="10sp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/row_rss_image"/>
+    <ImageButton
+        android:id="@+id/row_rss_expand"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/right"
+        android:rotation="90"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:scaleType="fitXY"
+        android:background="@null"
+        android:layout_alignParentEnd="true" />
+    <TextView
+        android:id="@+id/row_rss_text_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textColor="@color/colorTextBlack"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:layout_toEndOf="@id/row_rss_image"
+        android:layout_toStartOf="@id/row_rss_expand"/>
+    <TextView
+        android:id="@+id/row_rss_text_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description\nDeux lignes \nTrois lignes"
+        android:maxLines="20"
+        android:textColor="@color/colorTextRssDescription"
+        android:textSize="9sp"
+        android:visibility="gone"
+        android:layout_toEndOf="@id/row_rss_image"
+        android:layout_below="@id/row_rss_text_title"/>
+
+
+</RelativeLayout>
+</android.support.v7.widget.CardView>

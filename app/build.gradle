@@ -11,8 +11,8 @@ android {
         renderscriptTargetApi 26
         renderscriptSupportModeEnabled true
         multiDexEnabled true
-        versionCode 28
-        versionName "1.7.14"
+        versionCode 29
+        versionName "build 29"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
