@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AdBlocker {
-    private static final String AD_HOSTS_FILE = "pgl.yoyo.org.txt";
+    private static final String AD_HOSTS_FILE = "ad_hosts.txt";
     private static final Set<String> AD_HOSTS = new HashSet<>();
 
     public static void init(final Context context) {

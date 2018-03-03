@@ -23,6 +23,10 @@
             android:title="@string/prefs_hidebar"
             android:key="prefHideBar"
             android:defaultValue="true" />
+        <CheckBoxPreference
+            android:title="Plein écran"
+            android:key="prefFullscreen"
+            android:defaultValue="true" />
         <ListPreference
             android:title="Historique"
             android:key="prefHistory"

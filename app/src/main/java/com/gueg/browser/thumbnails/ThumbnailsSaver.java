@@ -27,7 +27,7 @@ public class ThumbnailsSaver {
                 FileOutputStream fos;
                 try {
                     fos = new FileOutputStream(imgPath);
-                    t.image.compress(Bitmap.CompressFormat.PNG, 50, fos);
+                    t.image.compress(Bitmap.CompressFormat.PNG, 30, fos);
                     fos.close();
 
                     fos = new FileOutputStream(urlPath);

@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -28,11 +29,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.transition.Explode;
 import android.util.Base64;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -44,25 +44,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gueg.browser.R;
+import com.gueg.browser.thumbnails.Thumbnail;
+import com.gueg.browser.thumbnails.ThumbnailsFragment;
+import com.gueg.browser.thumbnails.ThumbnailsSaver;
 import com.gueg.browser.update.UpdateTask;
 import com.gueg.browser.web.AdBlocker;
+import com.gueg.browser.web.WebFragment;
+import com.gueg.browser.web.bookmarks.Bookmark;
 import com.gueg.browser.web.bookmarks.BookmarkDialog;
 import com.gueg.browser.web.bookmarks.BookmarkInterface;
-import com.gueg.browser.web.history.HistoryAdapter;
-import com.gueg.browser.web.history.sql.SQLUtility;
-import com.gueg.browser.thumbnails.Thumbnail;
-import com.gueg.browser.thumbnails.ThumbnailsSaver;
-import com.gueg.browser.web.history.HistoryItem;
-import com.gueg.browser.web.WebFragment;
-import com.gueg.browser.rss.RssFragment;
-import com.gueg.browser.web.bookmarks.DbBitmapUtility;
-import com.gueg.browser.R;
-import com.gueg.browser.web.bookmarks.utilities.RecyclerItemClickListener;
-import com.gueg.browser.thumbnails.ThumbnailsFragment;
-import com.gueg.browser.web.bookmarks.utilities.VerticalSpaceItemDecoration;
-import com.gueg.browser.web.bookmarks.Bookmark;
 import com.gueg.browser.web.bookmarks.BookmarkSortActivity;
 import com.gueg.browser.web.bookmarks.BookmarksCardsAdapter;
+import com.gueg.browser.web.bookmarks.DbBitmapUtility;
+import com.gueg.browser.web.bookmarks.utilities.RecyclerItemClickListener;
+import com.gueg.browser.web.bookmarks.utilities.VerticalSpaceItemDecoration;
+import com.gueg.browser.web.history.HistoryAdapter;
+import com.gueg.browser.web.history.HistoryItem;
+import com.gueg.browser.web.history.sql.SQLUtility;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -70,6 +70,7 @@ import java.util.concurrent.TimeUnit;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
+@SuppressWarnings("unchecked")
 public class MainActivity extends AppCompatActivity implements OnMainActivityCallListener {
 
 
@@ -99,11 +100,10 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     boolean shortcut = false;
     //
     ImageButton btn_useragent;
-
+    // Shared Preferences
     SharedPreferences prefs;
-
+    // One tab mode
     WebFragment oneTabFrag;
-
     boolean oneTabMode = false;
 
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener =
@@ -119,45 +119,57 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     private final BroadcastReceiver connectivityChanged = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equalsIgnoreCase("android.net.conn.CONNECTIVITY_CHANGE")) {
+            if(intent.getAction()!=null&&intent.getAction().equalsIgnoreCase("android.net.conn.CONNECTIVITY_CHANGE")) {
                 ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-                refreshWebViews();
+                if(cm!=null) {
+                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                    refreshWebViews();
+                }
             }
         }
     };
 
 
 
+    /* ACTIVITY LIFECYCLE */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 
         // Inflating layout
 
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-        getWindow().setExitTransition(new Explode());
+        if(prefs.getBoolean("prefFullscreen",true))
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
-        AdBlocker.init(this);
+        new AsyncTask() {
+            @Override
+            public Object doInBackground(Object... params) {
+                AdBlocker.init(getApplicationContext());
+                return null;
+            }
+        }.execute();
+
         // is connected and receiver
 
         ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        lastState = isConnected;
-
-
+        if(cm!=null) {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+            lastState = isConnected;
+        }
         registerReceiver(connectivityChanged, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 
         // Fragments
 
-        fragment_container = (FrameLayout) findViewById(R.id.fragment_container);
+        fragment_container = findViewById(R.id.fragment_container);
 
         Uri startIntentData = getIntent().getData();
         if (startIntentData != null) {
@@ -176,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         if(!oneTabMode) {
             // Shared prefs rssClickListener
 
-            prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
             tab_manager = new ThumbnailsFragment();
@@ -185,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             // Bookmarks ---------------------------------
 
 
-            bookmarksDrawer = (RecyclerView) findViewById(R.id.recycler_view_bookmarks);
+            bookmarksDrawer = findViewById(R.id.recycler_view_bookmarks);
             bookmarksDrawer.setHasFixedSize(true);
 
             RecyclerView.LayoutManager mLayoutManager;
@@ -249,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             // Buttons --------------------------------------
 
 
-            ImageButton btn_fav = (ImageButton) findViewById(R.id.btn_drawer_favoris);
+            ImageButton btn_fav = findViewById(R.id.btn_drawer_favoris);
             btn_fav.setLongClickable(true);
             btn_fav.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -268,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             });
 
 
-            btn_useragent = (ImageButton) findViewById(R.id.btn_drawer_useragent);
+            btn_useragent = findViewById(R.id.btn_drawer_useragent);
             if (getIntent().getBooleanExtra("SHORTCUT", false)) {
                 shortcut = true;
                 btn_useragent.setImageDrawable(getDrawable(R.drawable.checkmark));
@@ -277,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
             // Drawer search ----------------------
 
-            final EditText search = (EditText) findViewById(R.id.drawer_search);
+            final EditText search = findViewById(R.id.drawer_search);
 
             search.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -317,16 +328,15 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             searchForUpdates();
 
             if (prefs.getBoolean("prefDarkTheme", false)) {
-                LinearLayout d = (LinearLayout) findViewById(R.id.drawer);
+                LinearLayout d = findViewById(R.id.drawer);
                 d.setBackgroundColor(0xff696969);
                 btn_fav.setBackgroundColor(0xff696969);
-                findViewById(R.id.btn_drawer_rss).setBackgroundColor(0xff696969);
                 btn_useragent.setBackgroundColor(0xff696969);
                 findViewById(R.id.btn_drawer_parametres).setBackgroundColor(0xff696969);
                 findViewById(R.id.btn_drawer_history).setBackgroundColor(0xff696969);
-                LinearLayout d1 = (LinearLayout) findViewById(R.id.drawer_buttons_1);
+                LinearLayout d1 = findViewById(R.id.drawer_buttons_1);
                 d1.setBackgroundColor(0xff696969);
-                LinearLayout d2 = (LinearLayout) findViewById(R.id.drawer_search_layout);
+                LinearLayout d2 = findViewById(R.id.drawer_search_layout);
                 d2.setBackgroundColor(0xff696969);
                 bookmarksDrawer.setBackgroundColor(0xff696969);
                 search.setTextColor(0xffC9C0BE);
@@ -356,33 +366,44 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                 }
             }
         }
-    }   // onCreate
+    }
 
+    @Override
+    public void onPause() {
+        if(!oneTabMode)
+            writeCurrentUrls();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
+        unregisterReceiver(connectivityChanged);
+        super.onDestroy();
+    }
+
+    /* BACK BUTTON ACTION */
 
     @Override
     public void onBackPressed() {
         if(oneTabMode) {
-            if(oneTabFrag.canGoBack())
-                oneTabFrag.goBack();
-            else
+            if(!oneTabFrag.tryGoBack())
                 finish();
             return;
+
         }
 
-        DrawerLayout dl = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout dl = findViewById(R.id.drawer_layout);
         if (dl.isDrawerOpen(GravityCompat.START))
             dl.closeDrawer(GravityCompat.START);
         else if (fragments.size() > 0) {
-            if(currentFragmentRss) {
-                currentFragmentRss = false;
-                showManager();
-            }
-            else if (getCurrentFragment()==null) {
+            if (getCurrentFragment()==null) {
                 endMainActivity();
-            } else if (getCurrentFragment().canGoBack())
-                getCurrentFragment().goBack();
-            else
+            } else if (!getCurrentFragment().tryGoBack()) {
+                Log.d(":-:","!goBack");
                 closeTab(getCurrentFragment());
+            }
         } else
             endMainActivity();
     }
@@ -400,20 +421,12 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         return super.onKeyLongPress(keyCode, event);
     }
 
-    @Override
-    public void onPause() {
-        if(!oneTabMode)
-            writeCurrentUrls();
-        super.onPause();
-    }
-
-
-
     public void endMainActivity() {
         writeCurrentUrls();
         finish();
     }
 
+    /* DRAWER BUTTONS ACTIONS */
 
     public void onClick(View v) {
         switch(v.getId()) {
@@ -425,9 +438,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             case R.id.btn_drawer_favoris:
                 if (fragments.size() > 0)
                     newBookmark();
-                break;
-            case R.id.btn_drawer_rss:
-                addRssTab();
                 break;
             case R.id.btn_drawer_history:
                 showHistoryDialog();
@@ -469,12 +479,16 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     }
 
 
-    // FRAGMENTS
+    /* TABS */
 
-    private WebFragment getCurrentFragment() {
-        return currentFragment;
+    // Adding tabs
+
+    public void onNewTab(String url, int pos) {
+        if (pos == -1)
+            addTab(url);
+        else
+            addTab(url, pos);
     }
-
 
     public void addTab() {
         FragmentTransaction transaction = manager.beginTransaction();
@@ -514,7 +528,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         }
     }
 
-
     public void addTab(String url, @SuppressWarnings("UnusedParameters") int posCurTab) {
         FragmentTransaction transaction = manager.beginTransaction();
 
@@ -539,39 +552,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
     }
 
-    private void addRssTab() {
-
-        RssFragment frag = new RssFragment();
-        manager.beginTransaction().add(fragment_container.getId(),frag,"RSS").commit();
-        manager.executePendingTransactions();
-
-        hideKeyboard();
-        fragments.add(frag);
-        thumbnails.add(new Thumbnail("RSS","",null));
-        currentFragmentPos = fragments.indexOf(frag);
-        frag.setPos(fragments.indexOf(frag));
-        onRefresh();
-        currentFragmentRss = true;
-        closeDrawer();
-    }
-
-
-    public void refreshTabs() {
-        if(tab_manager.getAdapter()!=null)
-            tab_manager.getAdapter().refresh(thumbnails);
-    }
-
-    public void notifyItemRemoved(int pos) {
-        if(tab_manager.getAdapter()!=null)
-            tab_manager.getAdapter().notifyItemRemoved(pos);
-    }
-
-    public void undoClose() {
-        if (lastClosed != null && lastClosed.length() > 0) {
-            addTab(lastClosed);
-            lastClosed = "";
-        }
-    }
+    // Closing tabs
 
     public void closeTab(int pos) {
         if (pos < fragments.size()) {
@@ -626,6 +607,19 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         refreshTabs();
     }
 
+    public void undoClose() {
+        if (lastClosed != null && lastClosed.length() > 0) {
+            addTab(lastClosed);
+            lastClosed = "";
+        }
+    }
+
+    public void notifyItemRemoved(int pos) {
+        if(tab_manager.getAdapter()!=null)
+            tab_manager.getAdapter().notifyItemRemoved(pos);
+    }
+
+    // Updating current tab
 
     public void setCurrentFragment(int pos) {
         FragmentTransaction transaction = manager.beginTransaction();
@@ -660,10 +654,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
                 currentFragment = frag;
                 frag.onCurrentFragment();
-                currentFragmentRss = false;
             }
-            else
-                currentFragmentRss = true;
 
 
             currentFragmentPos = pos;
@@ -763,23 +754,36 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         closeDrawer();
     }
 
-    @Override
-    public void onRefresh() {
-        refreshCurrentUrls();
-        refreshTabs();
-    }
-
-    @Override
     public void onSetCurrentFragment(int posFrag, int posLastFrag) {
         setCurrentFragment(posFrag);
         tab_manager.moveToPosition(posLastFrag);
     }
 
-    @Override
+    private WebFragment getCurrentFragment() {
+        return currentFragment;
+    }
+
+    // Refreshing thumbnails
+
+    public void onRefresh() {
+        refreshCurrentUrls();
+        refreshTabs();
+    }
+
+    public void refreshTabs() {
+        if(tab_manager.getAdapter()!=null)
+            tab_manager.getAdapter().refresh(thumbnails);
+    }
+
+    public ArrayList<Thumbnail> getThumbnails() {
+        return thumbnails;
+    }
+
+    // Tabs actions
+
     public void showManager() {
         setCurrentFragment(-1);
     }
-
 
     private boolean canSwitchTab = true;
     private CountDownTimer timer = new CountDownTimer(250, 250) {
@@ -791,9 +795,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             canSwitchTab = true;
         }
     }.start();
-
     @SuppressWarnings("ConstantConditions")
-    @Override
     public void onTabSwipe(boolean direction) {
         if (canSwitchTab) {
             if (!direction) {
@@ -808,22 +810,13 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         }
     }
 
-    @Override
-    public void onNewTab(String url, int pos) {
-        if (pos == -1)
-            addTab(url);
-        else
-            addTab(url, pos);
-    }
 
-
-
+    /* TABS - SAVING - LOADING */
 
     public void writeCurrentUrls() {
         ThumbnailsSaver.clearStorage(this);
         ThumbnailsSaver.saveToInternalSorage(this, thumbnails);
     }
-
 
     public boolean loadCurrentUrls() {
         boolean hasLoaded = false;
@@ -840,7 +833,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         return hasLoaded;
     }
 
-
     public void refreshCurrentUrls() {
         thumbnails.clear();
         for (ExtendedFragment frag : fragments)
@@ -848,13 +840,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     }
 
 
-    private void refreshColor() {
-        for (Fragment f : fragments) {
-            if(f instanceof WebFragment)
-                ((WebFragment)f).refreshColor();
-        }
-    }
-
+    /* BOOKMARKS */
 
     public void newBookmark() {
         if (getCurrentFragment()!=null) {
@@ -894,6 +880,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
         closeDrawer();
     }
+
     public void editBookmark(final int pos) {
         BookmarkInterface listener = new BookmarkInterface() {
             @Override
@@ -923,13 +910,70 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         dialog.show(manager,"DIALOG");
     }
 
-    private void closeDrawer() {
-        DrawerLayout dl = (DrawerLayout) findViewById(R.id.drawer_layout);
-        assert dl != null;
-        if (dl.isDrawerOpen(GravityCompat.START)) {
-            dl.closeDrawer(GravityCompat.START);
+    private void deleteBookmark(final int position, boolean showConfirmation) {
+        if(showConfirmation) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            dialog.dismiss();
+                            bookmarksList.remove(position);
+                            bookmarksDrawer.removeViewAt(position);
+                            mAdapter.notifyItemRemoved(position);
+                            mAdapter.notifyItemRangeChanged(position, bookmarksList.size());
+                            writeBookmarks();
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            mAdapter.notifyDataSetChanged();
+                            dialog.dismiss();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Supprimer le favori ?").setPositiveButton("Oui", dialogClickListener)
+                    .setNegativeButton("Non", dialogClickListener).show();
+        }
+        else {
+            bookmarksList.remove(position);
+            bookmarksDrawer.removeViewAt(position);
+            mAdapter.notifyItemRemoved(position);
+            mAdapter.notifyItemRangeChanged(position, bookmarksList.size());
+            writeBookmarks();
         }
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if (requestCode == ACTIVITY_RESULTS_BTN_FAV_SORT) {
+            if (resultCode == Activity.RESULT_OK) {
+                Bundle results = data.getExtras();
+                ArrayList<String> bookmarkListString = (ArrayList<String>) results.getSerializable("BOOKMARKS_LIST");
+
+                assert bookmarkListString != null;
+                for (int i = 0; i < bookmarkListString.size(); i++) {
+                    for (int j = 0; j < bookmarksList.size(); j++) {
+                        if (bookmarkListString.get(i).equals(bookmarksList.get(j).getName())) {
+                            Bookmark temp = bookmarksList.get(j);
+                            bookmarksList.remove(j);
+                            bookmarksList.add(i, temp);
+                        }
+                    }
+                }
+
+                mAdapter.notifyDataSetChanged();
+                writeBookmarks();
+            }
+            /*if (resultCode == Activity.RESULT_CANCELED) {
+
+            }*/
+        }
+    }
+
+    // Bookmarks saving - loading
 
     public void writeBookmarks() {
         SharedPreferences.Editor editor = sharedPrefFavs.edit();
@@ -989,80 +1033,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     }
 
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == ACTIVITY_RESULTS_BTN_FAV_SORT) {
-            if (resultCode == Activity.RESULT_OK) {
-                Bundle results = data.getExtras();
-                ArrayList<String> bookmarkListString = (ArrayList<String>) results.getSerializable("BOOKMARKS_LIST");
-
-                assert bookmarkListString != null;
-                for (int i = 0; i < bookmarkListString.size(); i++) {
-                    for (int j = 0; j < bookmarksList.size(); j++) {
-                        if (bookmarkListString.get(i).equals(bookmarksList.get(j).getName())) {
-                            Bookmark temp = bookmarksList.get(j);
-                            bookmarksList.remove(j);
-                            bookmarksList.add(i, temp);
-                        }
-                    }
-                }
-
-                mAdapter.notifyDataSetChanged();
-                writeBookmarks();
-            }
-            /*if (resultCode == Activity.RESULT_CANCELED) {
-
-            }*/
-        }
-    }
-
-
-    @Override
-    public void onDestroy() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
-        unregisterReceiver(connectivityChanged);
-        super.onDestroy();
-    }
-
-
-    private void deleteBookmark(final int position, boolean showConfirmation) {
-        if(showConfirmation) {
-            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            dialog.dismiss();
-                            bookmarksList.remove(position);
-                            bookmarksDrawer.removeViewAt(position);
-                            mAdapter.notifyItemRemoved(position);
-                            mAdapter.notifyItemRangeChanged(position, bookmarksList.size());
-                            writeBookmarks();
-                            break;
-
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            mAdapter.notifyDataSetChanged();
-                            dialog.dismiss();
-                            break;
-                    }
-                }
-            };
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Supprimer le favori ?").setPositiveButton("Oui", dialogClickListener)
-                    .setNegativeButton("Non", dialogClickListener).show();
-        }
-        else {
-            bookmarksList.remove(position);
-            bookmarksDrawer.removeViewAt(position);
-            mAdapter.notifyItemRemoved(position);
-            mAdapter.notifyItemRangeChanged(position, bookmarksList.size());
-            writeBookmarks();
-        }
-    }
+    /* UI Management */
 
     public void hideKeyboard() {
         View view = getCurrentFocus();
@@ -1072,21 +1043,43 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         }
     }
 
+    private void closeDrawer() {
+        DrawerLayout dl = findViewById(R.id.drawer_layout);
+        assert dl != null;
+        if (dl.isDrawerOpen(GravityCompat.START)) {
+            dl.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    private void refreshColor() {
+        for (Fragment f : fragments) {
+            if(f instanceof WebFragment)
+                ((WebFragment)f).refreshColor();
+        }
+    }
+
+
+    /* PERMISSIONS */
 
     private static final int REQUEST_PERMISSION_RESULT = 0;
+
     public int checkPermission(String permission) {
         return ContextCompat.checkSelfPermission(this,permission);
     }
+
     public void requestPermission(String permission) {
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission))
             ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION_RESULT);
     }
 
+    /* LOADING ERRORS */
+
     ArrayList<WebFragment> errors = new ArrayList<>();
-    @Override
+
     public void addToErrors(WebFragment frag) {
         errors.add(frag);
     }
+
     public void refreshWebViews() {
         if(isConnected&&!lastState) {
             for(WebFragment frag : errors)
@@ -1097,15 +1090,14 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
     }
 
 
-    public ArrayList<Thumbnail> getThumbnails() {
-        return thumbnails;
-    }
-
-
+    /* HISTORY */
 
     private ArrayList<HistoryItem> history;
     private SQLUtility sqlHistory;
     private long historyCountdown = 0;
+    RecyclerView historyRecyclerView;
+    String previousTitle = "";
+
     private void initHistory() {
         sqlHistory = new SQLUtility(this);
         history = new ArrayList<>();
@@ -1113,9 +1105,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             loadNextHistoryElements();
     }
 
-
-    String previousTitle = "";
-    @Override
     public void onPageLoaded(String title, String url) {
         if(!prefs.getString("prefHistory","Désactivé").equals("Désactivé")&&!prefs.getString("prefHistory","Désactivé").equals("0")&&System.currentTimeMillis()-historyCountdown>1000&&title!=null&&!title.isEmpty()&&!title.equals(previousTitle)) {
             history.add(0,new HistoryItem(title, url, System.currentTimeMillis()));
@@ -1125,14 +1114,11 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         }
     }
 
-
     private void writeHistory() {
         if(prefs.getString("prefHistory","Désactivé").equals("Permanent"))
             sqlHistory.write(history);
     }
 
-
-    RecyclerView historyRecyclerView;
     private void showHistoryDialog() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.fragment_history, null);
@@ -1206,11 +1192,13 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         });
         dialog.show();
     }
+
     private void loadNextHistoryElements() {
         history.addAll(sqlHistory.read20HistoryItems());
         if(historyRecyclerView!=null&&historyRecyclerView.getAdapter()!=null)
             historyRecyclerView.getAdapter().notifyDataSetChanged();
     }
+
     private void clearHistory() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -1233,6 +1221,10 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         builder.setMessage("Effacer l'historique ?").setPositiveButton("Oui", dialogClickListener)
                 .setNegativeButton("Non", dialogClickListener).show();
     }
+
+
+
+    /* UPDATES */
 
     private void searchForUpdates() {
         if (checkPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {

@@ -1,6 +1,5 @@
 package com.gueg.browser.web;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
@@ -20,9 +19,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.CookieManager;
@@ -55,8 +55,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gueg.browser.activities.ExtendedFragment;
 import com.gueg.browser.R;
+import com.gueg.browser.activities.ExtendedFragment;
 import com.gueg.browser.activities.MainActivity;
 import com.gueg.browser.activities.OnMainActivityCallListener;
 import com.gueg.browser.thumbnails.Thumbnail;
@@ -154,7 +154,7 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_webview, container, false);
         super.onCreateView(inflater,container,savedInstanceState);
         rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -163,16 +163,6 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 v.removeOnLayoutChangeListener(this);
-                int cx = getActivity().getWindow().getDecorView().getWidth()/2;
-                int cy = getActivity().getWindow().getDecorView().getHeight()/3;
-                int width = getActivity().getWindow().getDecorView().getWidth();
-                int height = getActivity().getWindow().getDecorView().getHeight();
-
-                float finalRadius = Math.max(width, height) / 2 + Math.max(width - cx, height - cy);
-                Animator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
-                anim.setDuration(1000);
-                anim.start();
-
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)web.getLayoutParams();
                 params.setMargins(0,rel.getHeight(),0,0);
@@ -408,6 +398,8 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
         CookieManager.getInstance().setAcceptCookie(true);
 
 
+
+        web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         progressBar = rootView.findViewById(R.id.progressBar);
         web.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -635,12 +627,12 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
 
 
 
-    public boolean canGoBack() {
-        return web.canGoBack();
-    }
-
-    public void goBack() {
-        web.goBack();
+    public boolean tryGoBack() {
+        if(web.canGoBack()) {
+            web.goBack();
+            return true;
+        } else
+            return false;
     }
 
     public WebView getWeb() {
@@ -691,7 +683,6 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
 
 
     private class SSLTolerentWebViewClient extends WebViewClient {
-
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if(!url.startsWith("http")) {
@@ -784,6 +775,7 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
                 mMainActivityListener.onRefresh();
                 mMainActivityListener.onPageLoaded(view.getTitle(), view.getUrl());
             }
+            Log.d(":-:","canGoBack? "+view.canGoBack());
         }
 
         @Override

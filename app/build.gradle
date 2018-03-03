@@ -2,17 +2,17 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
+    buildToolsVersion '27.0.1'
     defaultConfig {
         applicationId "com.gueg.browser"
         minSdkVersion 21
-        targetSdkVersion 26
-        renderscriptTargetApi 26
+        targetSdkVersion 27
+        renderscriptTargetApi 27
         renderscriptSupportModeEnabled true
         multiDexEnabled true
-        versionCode 29
-        versionName "build 29"
+        versionCode 33
+        versionName "build33"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -40,11 +40,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(":ColorPicker")
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support:cardview-v7:26.+'
-    compile 'com.android.support:recyclerview-v7:26.+'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:27.0.1'
+    compile 'com.android.support:cardview-v7:27.0.1'
+    compile 'com.android.support:recyclerview-v7:27.0.1'
     compile 'fr.tvbarthel.blurdialogfragment:lib:2.2.0'
     compile 'com.github.yukuku:ambilwarna:2.0.1'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
@@ -52,7 +51,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.leocardz:link-preview:2.0.0@aar'
     compile 'com.koushikdutta.urlimageviewhelper:urlimageviewhelper:1.0.4'
-    compile 'com.google.firebase:firebase-crash:10.0.1'
+    compile 'com.google.firebase:firebase-crash:11.6.0'
     testCompile 'junit:junit:4.12'
 }
 
