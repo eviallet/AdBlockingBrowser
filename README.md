@@ -6,7 +6,7 @@
 * Global navigation
 * Ads are hidden
 * Changing header bar color
-* Bookmarks, history databases
+* Bookmarks & history (databases)
 * Smooth animations
 
 # TODO
