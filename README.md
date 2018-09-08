@@ -2,6 +2,8 @@
 
 <img src="homepage.png" height="450" width="250">   <img src="bookmarks.png" height="450" width="250">   <img src="navigation.png" height="450" width="250">
 
+To be superseded by [GoldfishBrowser](https://github.com/eviallet/GoldfishBrowser)
+
 # Working
 * Global navigation
 * Ads are hidden
