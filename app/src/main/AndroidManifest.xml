@@ -15,7 +15,7 @@
         android:windowSoftInputMode="stateHidden|adjustResize"
         android:theme="@style/BrowserTheme" >
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,8 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".web.bookmarks.BookmarkSortActivity" />
-        <activity android:name=".activities.SettingsActivity" />
-        <activity android:name=".activities.ShortcutHandler" >
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".ShortcutHandler" >
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />

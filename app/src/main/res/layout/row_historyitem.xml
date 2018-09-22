@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="url"
             android:maxLines="1"
-            android:textColor="@color/colorTextRssDescription"
+            android:textColor="@color/colorTextBlack"
             android:textSize="9sp"
             android:layout_toEndOf="@id/row_history_date"
             android:layout_below="@id/row_history_title"/>

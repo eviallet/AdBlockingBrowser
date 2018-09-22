@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,72 +9,97 @@
         android:id="@+id/relat"
         android:layout_marginBottom="8dp">
 
-        <ImageView
-            android:layout_marginTop="3dp"
-            android:id="@+id/fragment_default_logo"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_launcher"
-            android:layout_marginBottom="5dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
-        <ImageButton
-            android:id="@+id/fragment_default_button"
-            android:layout_below="@id/fragment_default_logo"
-            android:layout_alignParentEnd="true"
-            android:scaleType="fitXY"
-            android:background="@null"
-            android:src="@drawable/search"
-            android:layout_marginEnd="10dp"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
-        <EditText
-            android:id="@+id/fragment_default_search"
-            android:layout_height="30dp"
-            android:paddingStart="7dp"
-            android:layout_toStartOf="@id/fragment_default_button"
-            android:background="@drawable/search_bar"
+        <android.support.v7.widget.CardView
+            android:layout_height="45dp"
             android:layout_width="match_parent"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="10dp"
-            android:layout_below="@id/fragment_default_logo"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:hint="Rechercher..."/>
+            android:layout_marginEnd="20dp"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp">
+                <ImageButton
+                    android:id="@+id/fragment_default_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+
+                    android:scaleType="fitXY"
+                    android:background="@null"
+                    android:src="@drawable/ic_search_black_24dp"
+
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"/>
+                <EditText
+                    android:id="@+id/fragment_default_search"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:ems="10"
+                    android:paddingStart="5dp"
+                    android:inputType="textPersonName"
+                    android:hint="Rechercher..."
+                    android:background="@android:color/transparent"
+
+                    android:layout_toStartOf="@id/fragment_default_button"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
     </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/fragment_tabcards_ll"
-        android:layout_height="75dp"
-        android:paddingBottom="15dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center|bottom"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:weightSum="7">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
         <ImageButton
             android:id="@+id/btn_tab_undo"
-            android:src="@drawable/tab_undo"
-            android:scaleType="fitXY"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="75dp"
-            android:background="@null"/>
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_undo_black_24dp"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
+            android:background="@drawable/circle_bkg_undo"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
         <ImageButton
             android:id="@+id/btn_tab_rem"
-            android:src="@drawable/tab_rem"
-            android:scaleType="fitXY"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="75dp"
-            android:background="@null"/>
-
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_clear_black_24dp"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
+            android:background="@drawable/circle_bkg_clear"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
         <ImageButton
             android:id="@+id/btn_tab_add"
-            android:src="@drawable/tab_add"
-            android:scaleType="fitXY"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@null" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_add_black_24dp"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
+            android:background="@drawable/circle_bkg_add"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

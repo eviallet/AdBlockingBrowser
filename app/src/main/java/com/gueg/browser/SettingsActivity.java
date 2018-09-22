@@ -1,4 +1,4 @@
-package com.gueg.browser.activities;
+package com.gueg.browser;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.gueg.browser.R;
 import com.gueg.browser.update.UpdateTask;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;

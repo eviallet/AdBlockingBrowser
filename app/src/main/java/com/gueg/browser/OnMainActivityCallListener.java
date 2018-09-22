@@ -1,4 +1,4 @@
-package com.gueg.browser.activities;
+package com.gueg.browser;
 
 
 import com.gueg.browser.web.WebFragment;

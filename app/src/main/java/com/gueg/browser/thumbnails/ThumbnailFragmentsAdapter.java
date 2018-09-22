@@ -1,18 +1,14 @@
 package com.gueg.browser.thumbnails;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.gueg.browser.R;
-import com.gueg.browser.activities.MainActivity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class ThumbnailFragmentsAdapter extends RecyclerView.Adapter<ThumbnailFragmentsAdapter.ViewHolder> {
 

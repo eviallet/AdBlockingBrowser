@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.InputType;
@@ -55,10 +57,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gueg.browser.MainActivity;
+import com.gueg.browser.OnMainActivityCallListener;
 import com.gueg.browser.R;
-import com.gueg.browser.activities.ExtendedFragment;
-import com.gueg.browser.activities.MainActivity;
-import com.gueg.browser.activities.OnMainActivityCallListener;
 import com.gueg.browser.thumbnails.Thumbnail;
 
 import java.io.File;
@@ -69,7 +70,7 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 
 
 @SuppressWarnings("deprecation")
-public class WebFragment extends ExtendedFragment implements AdapterView.OnItemClickListener {
+public class WebFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private OnMainActivityCallListener mMainActivityListener;
 
@@ -171,6 +172,7 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
                 fragHasBeenLoaded = true;
             }
         });
+
         web = rootView.findViewById(R.id.webView);
         rel = rootView.findViewById(R.id.relatLayoutWeb);
         text = rootView.findViewById(R.id.webViewText);
@@ -549,7 +551,16 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
             });
 
         userAgentDefault = web.getSettings().getUserAgentString();
-
+        /*
+        web.evaluateJavascript(
+                "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();",
+                new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String html) {
+                        Log.d("HTML", html);
+                    }
+                });
+        */
         return rootView;
     }
 
@@ -591,8 +602,9 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
 
     public void refreshColor() {
         homepage = mainPref.getString("prefHomepage","http://www.google.fr");
-        colorMain = mainPref.getInt("prefColorMain",0xffffffff);
-        colorBar =  mainPref.getInt("prefColorBar",0xffffffff);
+        assert getContext()!=null;
+        colorBar =  mainPref.getInt("prefColorBar",getContext().getResources().getColor(R.color.defaultHeaderColor));
+        colorMain = mainPref.getInt("prefColorMain",getContext().getResources().getColor(R.color.defaultLoadingColor));
 
 
         rel.setBackgroundTintList(ColorStateList.valueOf(colorBar));
@@ -601,7 +613,7 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
         btn_onglet.setBackgroundTintList(ColorStateList.valueOf(colorBar));
 
 
-        boolean isChecked = mainPref.getBoolean("prefColorBarText",true);
+        boolean isChecked = mainPref.getBoolean("prefColorBarText",false);
 
         if(isChecked)
             text.setTextColor(ColorStateList.valueOf(0xff000000));
@@ -679,6 +691,79 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
         }
     }
 
+
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        switch(menuChoices[position]) {
+            case "Rafraichir la page" :
+                web.reload();
+                break;
+            case "Suivant":
+                if(web.canGoForward())
+                    web.goForward();
+                break;
+            case "Ne pas bloquer les pubs ici" :
+                break;
+            case "Rechercher sur la page" :
+                if(findOnPageLayout.getVisibility()==View.GONE) {
+                    findOnPageLayout.setVisibility(View.VISIBLE);
+                    findOnPageLayout.bringToFront();
+                } else {
+                    findOnPageLayout.setVisibility(View.GONE);
+                    web.clearMatches();
+                }
+                break;
+            case "Rechercher un flux rss" :
+                break;
+            case "Voir le code source" :
+                web.loadUrl("view-source:"+web.getUrl());
+                break;
+			case "Dupliquer la page":
+				mMainActivityListener.onNewTab(web.getUrl(),posFrag);
+				break;
+            case "Copier le lien" :
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Lien", web.getUrl());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(getContext(), "Lien copié", Toast.LENGTH_SHORT).show();
+                break;
+            case "Partager le lien" :
+                Intent i=new Intent(android.content.Intent.ACTION_SEND);
+                i.setType("text/plain");
+                //i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Partager");
+                i.putExtra(android.content.Intent.EXTRA_TEXT, web.getUrl());
+                startActivity(Intent.createChooser(i,"Partager avec"));
+                break;
+            case "Ouvrir l'application complète" :
+                Intent intent = getActivity().getPackageManager()
+                        .getLaunchIntentForPackage( getActivity().getPackageName() );
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("COMPLETE",web.getUrl());
+                startActivity(intent);
+                break;
+        }
+        menu.dismiss();
+    }
+
+    public Thumbnail getThumbnail() {
+        if(fragHasBeenLoaded) {
+            return new Thumbnail(web.getTitle(), web.getUrl(), snapshot(web));
+        } else
+            return tempThumbnail;
+    }
+
+    private static Bitmap snapshot(WebView webView) {
+        Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        webView.draw(canvas);
+        return bitmap;
+    }
+
+    public void setTempThumbnail(Thumbnail t) {
+        tempThumbnail = t;
+    }
 
 
 
@@ -825,74 +910,6 @@ public class WebFragment extends ExtendedFragment implements AdapterView.OnItemC
         }
 
     }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switch(menuChoices[position]) {
-            case "Rafraichir la page" :
-                web.reload();
-                break;
-            case "Suivant":
-                if(web.canGoForward())
-                    web.goForward();
-                break;
-            case "Ne pas bloquer les pubs ici" :
-                break;
-            case "Rechercher sur la page" :
-                if(findOnPageLayout.getVisibility()==View.GONE) {
-                    findOnPageLayout.setVisibility(View.VISIBLE);
-                    findOnPageLayout.bringToFront();
-                } else {
-                    findOnPageLayout.setVisibility(View.GONE);
-                    web.clearMatches();
-                }
-                break;
-            case "Rechercher un flux rss" :
-                break;
-            case "Voir le code source" :
-                web.loadUrl("view-source:"+web.getUrl());
-                break;
-			case "Dupliquer la page":
-				mMainActivityListener.onNewTab(web.getUrl(),posFrag);
-				break;
-            case "Copier le lien" :
-                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Lien", web.getUrl());
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(getContext(), "Lien copié", Toast.LENGTH_SHORT).show();
-                break;
-            case "Partager le lien" :
-                Intent i=new Intent(android.content.Intent.ACTION_SEND);
-                i.setType("text/plain");
-                //i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Partager");
-                i.putExtra(android.content.Intent.EXTRA_TEXT, web.getUrl());
-                startActivity(Intent.createChooser(i,"Partager avec"));
-                break;
-            case "Ouvrir l'application complète" :
-                Intent intent = getActivity().getPackageManager()
-                        .getLaunchIntentForPackage( getActivity().getPackageName() );
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("LINK",web.getUrl());
-                startActivity(intent);
-                break;
-        }
-        menu.dismiss();
-    }
-
-    @Override
-    public Thumbnail getThumbnail() {
-        if(fragHasBeenLoaded) {
-            web.buildDrawingCache();
-            return new Thumbnail(web.getTitle(), web.getUrl(), web.getDrawingCache());
-        } else
-            return tempThumbnail;
-    }
-
-    @Override
-    public void setTempThumbnail(Thumbnail t) {
-        tempThumbnail = t;
-    }
-
 
 
 

@@ -12,8 +12,7 @@
         android:layout_alignParentBottom="true"
         android:textAlignment="center"
         android:maxLines="2"
-        android:textColor="@color/colorTextBlack"
-        android:text="Title\nTwo lines"/>
+        android:textColor="@color/colorTextBlack"/>
     <ImageView
         android:id="@+id/row_thumbnail_w"
         android:layout_width="match_parent"

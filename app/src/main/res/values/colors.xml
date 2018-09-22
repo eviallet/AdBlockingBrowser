@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ea4e00</color>
-    <color name="colorPrimaryDark">#ea4e00</color>
-    <color name="colorAccent">#3f51b5</color>
+    <color name="colorPrimary">#616161</color>
+    <color name="colorPrimaryDark">#455a64</color>
+    <color name="colorAccent">#2e7d32</color>
     <color name="colorDrawer">#D8D8D8</color>
     <color name="colorDivider">#C9C0BE</color>
     <color name="colorLVBackground">#FFFFFF</color>
@@ -10,6 +10,7 @@
     <color name="colorTextWhite">#FFFFFF</color>
     <color name="colorTextWebView">#FFFFFF</color>
 
-    <color name="colorTextRssDescription">#797979</color>
+    <color name="defaultHeaderColor">#FFB71C1C</color>
+    <color name="defaultLoadingColor">#FF8BC34A</color>
 
 </resources>

@@ -3,7 +3,6 @@ package com.gueg.browser.web;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.webkit.WebResourceResponse;
 import java.io.BufferedReader;
@@ -32,7 +31,6 @@ public class AdBlocker {
         }.execute();
     }
 
-    @WorkerThread
     private static void loadFromAssets(Context context) throws IOException {
         BufferedReader reader;
 

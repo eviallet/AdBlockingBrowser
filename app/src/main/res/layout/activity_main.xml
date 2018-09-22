@@ -32,7 +32,7 @@
             android:background="@color/colorDrawer">
             <ImageButton
                 android:id="@+id/btn_drawer_favoris"
-                android:src="@drawable/star"
+                android:src="@drawable/ic_bookmark_border_black_24dp"
                 android:scaleType="fitCenter"
                 android:layout_width="50dp"
                 android:onClick="onClick"
@@ -42,13 +42,13 @@
                android:id="@+id/btn_drawer_useragent"
                android:layout_width="50dp"
                android:scaleType="fitCenter"
-               android:src="@drawable/smartphone"
+               android:src="@drawable/ic_aspect_ratio_black_24dp"
                 android:onClick="onClick"
                android:layout_height="50dp"
                tools:ignore="ContentDescription" />
             <ImageButton
                 android:id="@+id/btn_drawer_parametres"
-                android:src="@drawable/ic_settings_web"
+                android:src="@drawable/ic_settings_black_24dp"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:scaleType="fitCenter"
@@ -56,7 +56,7 @@
                 tools:ignore="ContentDescription" />
             <ImageButton
                 android:id="@+id/btn_drawer_history"
-                android:src="@drawable/history"
+                android:src="@drawable/ic_history_black_24dp"
                 android:layout_width="50dp"
                 android:onClick="onClick"
                 android:scaleType="fitCenter"
@@ -71,7 +71,7 @@
             android:orientation="horizontal">
             <ImageView
                 android:id="@+id/vocalsearch"
-                android:src="@drawable/search"
+                android:src="@drawable/ic_search_black_24dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="2dp"
@@ -82,6 +82,8 @@
                 android:maxLines="1"
                 android:ems="10"
                 android:inputType="textPersonName"
+
+                android:background="@android:color/transparent"
                 android:hint="Rechercher..."
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />

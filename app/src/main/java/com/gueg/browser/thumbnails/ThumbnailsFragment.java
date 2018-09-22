@@ -3,6 +3,7 @@ package com.gueg.browser.thumbnails;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -14,15 +15,16 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.azoft.carousellayoutmanager.CarouselLayoutManager;
 import com.azoft.carousellayoutmanager.CarouselZoomPostLayoutListener;
 import com.azoft.carousellayoutmanager.CenterScrollListener;
 import com.gueg.browser.R;
+import com.gueg.browser.MainActivity;
 import com.gueg.browser.web.bookmarks.utilities.RecyclerItemClickListener;
 import com.gueg.browser.web.bookmarks.utilities.VerticalSpaceItemDecoration;
-import com.gueg.browser.activities.MainActivity;
+
 import java.util.ArrayList;
 
 public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeListener {
@@ -45,7 +47,7 @@ public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeLi
 
     @SuppressWarnings("deprecation")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tabcards,container,false);
 
         list = ((MainActivity)getActivity()).getThumbnails();
@@ -57,16 +59,8 @@ public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeLi
         boolean theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("prefDarkTheme",false);
         if(theme) {
             rootView.setBackgroundColor(0xff313335);
-            search.setBackgroundDrawable(getActivity().getDrawable(R.drawable.search_bar_dark));
+            //search.setBackgroundDrawable(getActivity().getDrawable(R.drawable.search_bar_dark));
         }
-        ImageView logo = rootView.findViewById(R.id.fragment_default_logo);
-
-        logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.animate().rotation(360).setDuration(5000).start();
-            }
-        });
 
         search.setImeOptions(EditorInfo.IME_ACTION_DONE);
 

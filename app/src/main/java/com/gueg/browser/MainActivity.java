@@ -1,5 +1,6 @@
-package com.gueg.browser.activities;
+package com.gueg.browser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,7 +31,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Base64;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -40,11 +40,9 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gueg.browser.R;
 import com.gueg.browser.thumbnails.Thumbnail;
 import com.gueg.browser.thumbnails.ThumbnailsFragment;
 import com.gueg.browser.thumbnails.ThumbnailsSaver;
@@ -75,11 +73,11 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
 
     int ACTIVITY_RESULTS_BTN_FAV_SORT = 1;
-    // Fragment managing
+    // Fragment management
     FragmentManager manager = getSupportFragmentManager();
     ThumbnailsFragment tab_manager;
     FrameLayout fragment_container;
-    ArrayList<ExtendedFragment> fragments = new ArrayList<>();
+    ArrayList<WebFragment> fragments = new ArrayList<>();
     WebFragment currentFragment;
     int currentFragmentPos;
     boolean currentFragmentRss = false;
@@ -135,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
     /* ACTIVITY LIFECYCLE */
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -171,6 +170,16 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
         fragment_container = findViewById(R.id.fragment_container);
 
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getStringExtra("LINK") != null) {
+                oneTabMode = true;
+                oneTabFrag = new WebFragment();
+                oneTabFrag.setOnStartUrl(getIntent().getStringExtra("LINK"));
+                oneTabFrag.setOneTabMode();
+                manager.beginTransaction().add(fragment_container.getId(), oneTabFrag, "onetab").commit();
+                ((DrawerLayout) findViewById(R.id.drawer_layout)).setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            }
+        }
         Uri startIntentData = getIntent().getData();
         if (startIntentData != null) {
             String intentUrl = startIntentData.toString();
@@ -186,8 +195,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
 
         if(!oneTabMode) {
-            // Shared prefs rssClickListener
-
             prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
             tab_manager = new ThumbnailsFragment();
@@ -282,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             btn_useragent = findViewById(R.id.btn_drawer_useragent);
             if (getIntent().getBooleanExtra("SHORTCUT", false)) {
                 shortcut = true;
-                btn_useragent.setImageDrawable(getDrawable(R.drawable.checkmark));
+                btn_useragent.setImageDrawable(getDrawable(R.drawable.ic_check_black_24dp));
                 btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
             }
 
@@ -327,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
             searchForUpdates();
 
+            /*
             if (prefs.getBoolean("prefDarkTheme", false)) {
                 LinearLayout d = findViewById(R.id.drawer);
                 d.setBackgroundColor(0xff696969);
@@ -341,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                 bookmarksDrawer.setBackgroundColor(0xff696969);
                 search.setTextColor(0xffC9C0BE);
             }
+            */
 
 
             // =================================== FRAGMENTS
@@ -354,17 +363,18 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
             initHistory();
 
+            if (getIntent().getExtras() != null) {
+                if (getIntent().getStringExtra("COMPLETE") != null) {
+                    addTab(getIntent().getStringExtra("COMPLETE"));
+                }
+            }
+
 
             if (prefs.getBoolean("prefHideKeyboard", false))
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-            if (getIntent().getExtras() != null) {
-                if (getIntent().getStringExtra("LINK") != null)
-                    addTab(getIntent().getStringExtra("LINK"));
-                else if (getIntent().getStringExtra("CLEAR_HISTORY") != null && getIntent().getStringExtra("CLEAR_HISTORY").equals("1")) {
+            if (getIntent().getExtras() != null && getIntent().getStringExtra("CLEAR_HISTORY") != null && getIntent().getStringExtra("CLEAR_HISTORY").equals("1"))
                     clearHistory();
-                }
-            }
         }
     }
 
@@ -401,7 +411,6 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             if (getCurrentFragment()==null) {
                 endMainActivity();
             } else if (!getCurrentFragment().tryGoBack()) {
-                Log.d(":-:","!goBack");
                 closeTab(getCurrentFragment());
             }
         } else
@@ -467,10 +476,12 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                 } else {
                     if (getCurrentFragment()!=null) {
                         boolean isMobile = getCurrentFragment().toggleUserAgent();
+                        /*
                         if (isMobile)
                             btn_useragent.setImageDrawable(getDrawable(R.drawable.smartphone));
                         else
                             btn_useragent.setImageDrawable(getDrawable(R.drawable.mouse));
+                            */
                     }
                 }
                 break;
@@ -573,11 +584,10 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         }
     }
 
-    public void closeTab(ExtendedFragment frag) {
+    public void closeTab(WebFragment frag) {
         FragmentTransaction transaction = manager.beginTransaction();
 
-        if(frag instanceof WebFragment)
-            lastClosed = ((WebFragment)frag).getWeb().getUrl();
+        lastClosed = frag.getWeb().getUrl();
         transaction.remove(frag);
 
         int pos = fragments.indexOf(frag);
@@ -644,6 +654,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
             if(fragments.get(pos) instanceof WebFragment) {
                 WebFragment frag = (WebFragment) fragments.get(pos);
+                /*
                 if (frag.getUserAgent()) {
                     btn_useragent.setImageDrawable(getDrawable(R.drawable.smartphone));
                     btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -651,6 +662,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                     btn_useragent.setImageDrawable(getDrawable(R.drawable.mouse));
                     btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 }
+                */
 
                 currentFragment = frag;
                 frag.onCurrentFragment();
@@ -692,6 +704,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
             if(fragments.get(pos) instanceof WebFragment) {
                 WebFragment frag = (WebFragment)fragments.get(pos);
+                /*
                 if (frag.getUserAgent()) {
                     btn_useragent.setImageDrawable(getDrawable(R.drawable.smartphone));
                     btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -699,6 +712,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                     btn_useragent.setImageDrawable(getDrawable(R.drawable.mouse));
                     btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 }
+                */
 
                 currentFragment = frag;
                 frag.onCurrentFragment();
@@ -734,18 +748,22 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             currentFragment = frag;
             frag.onCurrentFragment();
             if (!shortcut) {
+                /*
                 btn_useragent.setImageDrawable(getDrawable(R.drawable.smartphone));
                 btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                */
                 currentFragmentRss = false;
                 currentFragmentPos = fragments.indexOf(frag);
             }
         } else if (frag!=null) {
             currentFragment = frag;
             frag.onCurrentFragment();
+            /*
             if (!shortcut) {
                 btn_useragent.setImageDrawable(getDrawable(R.drawable.mouse));
                 btn_useragent.setScaleType(ImageView.ScaleType.FIT_CENTER);
             }
+            */
             currentFragmentRss = false;
             currentFragmentPos = fragments.indexOf(frag);
         }
@@ -835,7 +853,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
     public void refreshCurrentUrls() {
         thumbnails.clear();
-        for (ExtendedFragment frag : fragments)
+        for (WebFragment frag : fragments)
             thumbnails.add(frag.getThumbnail());
     }
 
@@ -1112,11 +1130,15 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             previousTitle = title;
             writeHistory();
         }
-    }
-
-    private void writeHistory() {
-        if(prefs.getString("prefHistory","Désactivé").equals("Permanent"))
-            sqlHistory.write(history);
+        boolean found = false;
+        for(int i=0; i<bookmarksList.size(); i++)
+            if(bookmarksList.get(i).getUrl().equals(url)) {
+                ((ImageButton)(findViewById(R.id.btn_drawer_favoris))).setImageDrawable(getDrawable(R.drawable.ic_bookmark_black_24dp));
+                found = true;
+                break;
+            }
+        if(!found)
+            ((ImageButton)(findViewById(R.id.btn_drawer_favoris))).setImageDrawable(getDrawable(R.drawable.ic_bookmark_border_black_24dp));
     }
 
     private void showHistoryDialog() {
@@ -1193,6 +1215,11 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         dialog.show();
     }
 
+    private void writeHistory() {
+        if(prefs.getString("prefHistory","Désactivé").equals("Permanent"))
+            sqlHistory.write(history);
+    }
+
     private void loadNextHistoryElements() {
         history.addAll(sqlHistory.read20HistoryItems());
         if(historyRecyclerView!=null&&historyRecyclerView.getAdapter()!=null)
@@ -1230,7 +1257,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
         if (checkPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             if(isConnected) {
                 long lastUpdate = prefs.getLong("SEEK_FOR_UPDATES", 0);
-                if (TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lastUpdate) >= 24) {
+                if (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastUpdate) >= 30) {
                     UpdateTask update = new UpdateTask(this,UpdateTask.NO_TOAST);
                     update.execute(UpdateTask.UPDATE_LINK);
                     prefs.edit().putLong("SEEK_FOR_UPDATES", System.currentTimeMillis()).apply();

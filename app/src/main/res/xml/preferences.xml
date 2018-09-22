@@ -14,7 +14,7 @@
         <CheckBoxPreference
             android:title="@string/prefs_hidekeyboard"
             android:key="prefHideKeyboard"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
         <CheckBoxPreference
             android:title="@string/prefs_savetabs"
             android:key="prefSaveTabs"
@@ -33,7 +33,7 @@
             android:entries="@array/history_pref"
             android:entryValues="@array/history_pref"
             android:summary="Désactivé"
-            android:defaultValue="0" />
+            android:defaultValue="Par session" />
         <Preference
             android:title="@string/prefs_share"
             android:key="prefShare" />
@@ -44,16 +44,16 @@
     <PreferenceCategory android:title="@string/pref_cat_color" >
         <yuku.ambilwarna.widget.AmbilWarnaPreference
             android:key="prefColorBar"
-            android:defaultValue="@color/colorTextWebView"
+            android:defaultValue="0xFFB71C1C"
             android:title="@string/pref_colorBar" />
         <yuku.ambilwarna.widget.AmbilWarnaPreference
             android:key="prefColorMain"
-            android:defaultValue="@color/accent_material_light"
+            android:defaultValue="0xFF8BC34A"
             android:title="@string/pref_colorMain" />
         <CheckBoxPreference
             android:title="@string/pref_colorBarText"
             android:key="prefColorBarText"
-            android:defaultValue="true" />
+            android:defaultValue="false" />
         <CheckBoxPreference
             android:title="Theme sombre"
             android:key="prefDarkTheme"
