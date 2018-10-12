@@ -25,7 +25,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.InputType;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -581,14 +580,16 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
 
     public boolean toggleUserAgent() {
         if (userAgentMobile) {
-            web.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+            web.getSettings().setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
             userAgentMobile = false;
+            webSettings.setLoadWithOverviewMode(true);
             webSettings.setUseWideViewPort(true);
             web.reload();
         } else {
             web.getSettings().setUserAgentString(userAgentDefault);
             userAgentMobile = true;
             webSettings.setUseWideViewPort(false);
+            webSettings.setLoadWithOverviewMode(false);
             web.reload();
         }
         return userAgentMobile;
@@ -860,7 +861,6 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
                 mMainActivityListener.onRefresh();
                 mMainActivityListener.onPageLoaded(view.getTitle(), view.getUrl());
             }
-            Log.d(":-:","canGoBack? "+view.canGoBack());
         }
 
         @Override

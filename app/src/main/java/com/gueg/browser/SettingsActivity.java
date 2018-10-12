@@ -55,6 +55,7 @@ public class SettingsActivity extends PreferenceActivity {
         SharedPreferences mainPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         homepage.setSummary(mainPref.getString("prefHomepage","http://www.google.fr"));
 
+        /*
         final Preference btn_update = findPreference("prefUpdate");
 
         try {
@@ -64,7 +65,6 @@ public class SettingsActivity extends PreferenceActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
         btn_update.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -78,7 +78,7 @@ public class SettingsActivity extends PreferenceActivity {
                 return true;
             }
         });
-
+*/
         Preference colorMain = findPreference("prefColorMain");
         Preference colorBarText = findPreference("prefColorBarText");
         Preference colorBar = findPreference("prefColorBar");

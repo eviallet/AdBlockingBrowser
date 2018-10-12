@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
                 }
             });
 
-            searchForUpdates();
+            //searchForUpdates();
 
             /*
             if (prefs.getBoolean("prefDarkTheme", false)) {
@@ -1252,7 +1252,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
 
     /* UPDATES */
-
+/*
     private void searchForUpdates() {
         if (checkPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             if(isConnected) {
@@ -1267,7 +1267,7 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             requestPermission(WRITE_EXTERNAL_STORAGE);
 
     }
-
+*/
 
 
 }
