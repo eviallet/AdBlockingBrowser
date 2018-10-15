@@ -750,16 +750,10 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
 
     public Thumbnail getThumbnail() {
         if(fragHasBeenLoaded) {
-            return new Thumbnail(web.getTitle(), web.getUrl(), snapshot(web));
+            web.buildDrawingCache();
+            return new Thumbnail(web.getTitle(), web.getUrl(), web.getDrawingCache());
         } else
             return tempThumbnail;
-    }
-
-    private static Bitmap snapshot(WebView webView) {
-        Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        webView.draw(canvas);
-        return bitmap;
     }
 
     public void setTempThumbnail(Thumbnail t) {
