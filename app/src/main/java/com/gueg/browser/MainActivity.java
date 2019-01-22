@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -46,7 +45,6 @@ import android.widget.Toast;
 import com.gueg.browser.thumbnails.Thumbnail;
 import com.gueg.browser.thumbnails.ThumbnailsFragment;
 import com.gueg.browser.thumbnails.ThumbnailsSaver;
-import com.gueg.browser.update.UpdateTask;
 import com.gueg.browser.web.AdBlocker;
 import com.gueg.browser.web.WebFragment;
 import com.gueg.browser.web.bookmarks.Bookmark;
@@ -63,9 +61,6 @@ import com.gueg.browser.web.history.sql.SQLUtility;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 @SuppressWarnings("unchecked")
@@ -147,13 +142,12 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
 
         setContentView(R.layout.activity_main);
 
-        new AsyncTask() {
+        new Thread(new Runnable() {
             @Override
-            public Object doInBackground(Object... params) {
+            public void run() {
                 AdBlocker.init(getApplicationContext());
-                return null;
             }
-        }.execute();
+        }).start();
 
         // is connected and receiver
 

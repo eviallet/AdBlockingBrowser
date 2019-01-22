@@ -486,7 +486,6 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
             webSettings.setDomStorageEnabled(true);
             webSettings.setLoadWithOverviewMode(true);
             webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-            webSettings.setLoadWithOverviewMode(true);
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         }
 
@@ -727,8 +726,10 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
             case "Copier le lien" :
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Lien", web.getUrl());
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(getContext(), "Lien copié", Toast.LENGTH_SHORT).show();
+                if(clipboard!=null) {
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getContext(), "Lien copié", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case "Partager le lien" :
                 Intent i=new Intent(android.content.Intent.ACTION_SEND);

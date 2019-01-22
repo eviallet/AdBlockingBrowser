@@ -48,19 +48,19 @@ public class AdBlocker {
     private static boolean isAdHost(String url) {
         boolean domainFound = false;
         int i=0;
-        String domain = "";
+        StringBuilder domain = new StringBuilder();
         char c;
         while(!domainFound&&i<url.length()) {
             c = url.charAt(i);
-            domain+=c;
-            if(domain.contains("http://")||domain.contains("https://")||domain.contains("www.")||domain.matches("ww[0-9]."))
-                domain="";
-            if(domain.contains(".fr")||domain.contains(".com")||domain.contains(".net")||domain.contains(".co.uk")||domain.contains(".de"))
+            domain.append(c);
+            if(domain.toString().contains("http://")|| domain.toString().contains("https://")|| domain.toString().contains("www.")|| domain.toString().matches("ww[0-9]."))
+                domain = new StringBuilder();
+            if(domain.toString().contains(".fr")|| domain.toString().contains(".com")|| domain.toString().contains(".net")|| domain.toString().contains(".co.uk")|| domain.toString().contains(".de"))
                 domainFound=true;
 
             i++;
         }
-        return AD_HOSTS.contains(domain);
+        return AD_HOSTS.contains(domain.toString());
     }
 
     static WebResourceResponse createEmptyResource() {

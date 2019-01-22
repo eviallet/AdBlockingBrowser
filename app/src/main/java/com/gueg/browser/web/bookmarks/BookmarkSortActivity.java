@@ -28,7 +28,7 @@ public class BookmarkSortActivity extends Activity {
 
 
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_bookmarks_sort);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_bookmarks_sort);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager;
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
