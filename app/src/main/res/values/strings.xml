@@ -22,6 +22,7 @@
     <string name="prefs_share">Partager</string>
     <string name="prefs_update">Vérifier les mises à jour</string>
     <string name="prefs_adblock">Bloquer les pubs</string>
+    <string name="prefs_fbblock">Bloquer facebook, twitter etc</string>
     <string name="prefs_hidekeyboard">Cacher le clavier au démarrage</string>
     <string name="prefs_savetabs">Garder les onglets ouverts en mémoire</string>
     <string name="prefs_hidebar">Masquer automatiquement la barre</string>

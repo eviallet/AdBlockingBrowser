@@ -146,6 +146,8 @@ public class MainActivity extends AppCompatActivity implements OnMainActivityCal
             @Override
             public void run() {
                 AdBlocker.init(getApplicationContext());
+                if(prefs.getBoolean("prefFbBlock", true))
+                    AdBlocker.initTrackers();
             }
         }).start();
 

@@ -4,6 +4,7 @@ package com.gueg.browser.web;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebResourceResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -29,6 +30,13 @@ public class AdBlocker {
                 return null;
             }
         }.execute();
+    }
+
+    public static void initTrackers() {
+        AD_HOSTS.add("facebook.com");
+        AD_HOSTS.add("twitter.com");
+        AD_HOSTS.add("platform.twitter.com");
+        AD_HOSTS.add("syndication.twitter.com");
     }
 
     private static void loadFromAssets(Context context) throws IOException {

@@ -12,6 +12,10 @@
             android:key="prefAdBlock"
             android:defaultValue="true" />
         <CheckBoxPreference
+            android:title="@string/prefs_fbblock"
+            android:key="prefFbBlock"
+            android:defaultValue="true" />
+        <CheckBoxPreference
             android:title="@string/prefs_hidekeyboard"
             android:key="prefHideKeyboard"
             android:defaultValue="true" />
@@ -34,10 +38,10 @@
             android:entryValues="@array/history_pref"
             android:summary="Désactivé"
             android:defaultValue="Par session" />
+        <!--
         <Preference
             android:title="@string/prefs_share"
             android:key="prefShare" />
-        <!--
         <Preference
             android:title="@string/prefs_update"
             android:key="prefUpdate" />
