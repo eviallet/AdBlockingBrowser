@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.KeyEvent;
@@ -136,7 +137,7 @@ public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeLi
         });
 
 
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.UP) {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -146,7 +147,7 @@ public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeLi
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition(); //get position which is swiped
 
-                if (direction == ItemTouchHelper.UP) {
+                if (direction == ItemTouchHelper.RIGHT) {
                     ((MainActivity)getActivity()).closeTab(position);
                     mRecyclerView.removeViewAt(position);
                     mAdapter.notifyItemRemoved(position);
@@ -160,15 +161,16 @@ public class ThumbnailsFragment extends Fragment implements View.OnFocusChangeLi
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
 
-        final CarouselLayoutManager layoutManager = new CarouselLayoutManager(CarouselLayoutManager.HORIZONTAL, false);
-        layoutManager.setPostLayoutListener(new CarouselZoomPostLayoutListener());
+        //final CarouselLayoutManager layoutManager = new CarouselLayoutManager(CarouselLayoutManager.VERTICAL, false);
+        //layoutManager.setPostLayoutListener(new CarouselZoomPostLayoutListener());
 
         mAdapter = new ThumbnailFragmentsAdapter(list,theme);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnScrollListener(new CenterScrollListener());
+        mRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
 
         mRecyclerView.addOnItemTouchListener(

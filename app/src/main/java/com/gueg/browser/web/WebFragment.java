@@ -751,8 +751,8 @@ public class WebFragment extends Fragment implements AdapterView.OnItemClickList
 
     public Thumbnail getThumbnail() {
         if(fragHasBeenLoaded) {
-            web.buildDrawingCache();
-            return new Thumbnail(web.getTitle(), web.getUrl(), web.getDrawingCache());
+            //web.buildDrawingCache();
+            return new Thumbnail(web.getTitle(), web.getUrl(), web.getFavicon());
         } else
             return tempThumbnail;
     }
